@@ -1,2 +1,2 @@
 # NeuralBase
-Basic implementation of neural networks
+Basic implementation of neural networks.
