@@ -11,9 +11,14 @@ class FullyConnectedLayer:
         self.previousLayer = None
         self.weights = None
 
+    def ConectLayer(previosLayer, followingLayer):
+        self.previousLayer = previosLayer
+        self.followingLayer = followingLayer
+
     def InitializeWeights():
         variance = 2/(previousLayer.numberOfNeurons + followingLayer.numberOfNeurons)
-        self.weights = np.random.uniform(-variance, variance, (previousLayer.numberOfNeurons, previousLayer.forwardOutput.shape[0]))
+        self.weights = np.random.uniform(-variance, variance, (previousLayer.numberOfNeurons, previousLayer.batchSize))
 
     def ForwardOutput():
         self.forwardOutput = np.dot(previousLayer.forwardOutput, self.weights)
+        self.forwardOutput =
