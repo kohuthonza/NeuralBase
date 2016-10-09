@@ -1,14 +1,14 @@
 import numpy as np
 
-class InputLayer:
+class InputLayer(object):
 
-    def __init__(self, numberOfInputs):
-        self.numberOfNeurons = numberOfInputs
-        self.batchSize = None
+    def __init__(self, dataShape):
+        self.numberOfNeurons = dataShape.channels * dataShape.height * dataShape.width
         self.forwardOutput = None
 
-    def ForwardOutput(input):
-        self.batchSize = len(input)
-        self.forwardOutput = np.zeros((self.batchSize, self.numberOfNeurons))
+    def ForwardOutput(self, input, dataShape):
+        self.forwardOutput = np.zeros((dataShape.batchSize, dataShape.channels, dataShape.height, dataShape.width))
         for i, data in enumerate(input):
-            self.forwardOutput[i] = data.reshape(self.numberOfNeurons)
+            if dataShape.channels == 3:
+                data = np.rollaxis(data, 2, 0)
+            self.forwardOutput[i] = data

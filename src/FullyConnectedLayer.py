@@ -1,24 +1,28 @@
 import numpy as np
 import random
+import Sigmoid
 
-class FullyConnectedLayer:
+class FullyConnectedLayer(object):
 
-    __init__(self, numberOfNeurons, activationFunction):
+    def __init__(self, numberOfNeurons, activationFunction):
         self.numberOfNeurons = numberOfNeurons
+        self.activationFunction = activationFunction
         self.forwardOutput = None
         self.backwardoutput = None
         self.followingLayer = None
         self.previousLayer = None
         self.weights = None
 
-    def ConectLayer(previosLayer, followingLayer):
-        self.previousLayer = previosLayer
-        self.followingLayer = followingLayer
+    def InitializeWeights(self):
+        variance = 2.0/(self.previousLayer.numberOfNeurons + self.numberOfNeurons)
+        self.weights = np.random.uniform(-variance, variance, (self.previousLayer.numberOfNeurons, self.numberOfNeurons))
 
-    def InitializeWeights():
-        variance = 2/(previousLayer.numberOfNeurons + followingLayer.numberOfNeurons)
-        self.weights = np.random.uniform(-variance, variance, (previousLayer.numberOfNeurons, previousLayer.batchSize))
+    def ForwardOutput(self):
+        if not (self.previousLayer.forwardOutput.shape[1] == 1 and self.previousLayer.forwardOutput.shape[3] == 1):
+            self.forwardOutput = np.dot(self.previousLayer.forwardOutput.reshape(self.previousLayer.forwardOutput.shape[0], 1, -1, 1)[:, 0, :, 0], self.weights)
+        else:
+            self.forwardOutput = np.dot(self.previousLayer.forwardOutput[:, 0, :, 0], self.weights)
+        self.forwardOutput = self.forwardOutput.reshape(self.previousLayer.forwardOutput.shape[0], 1, -1, 1)
 
-    def ForwardOutput():
-        self.forwardOutput = np.dot(previousLayer.forwardOutput, self.weights)
-        self.forwardOutput =
+        if self.activationFunction == 'Sigmoid':
+            self.forwardOutput = Sigmoid.Sigmoid.ForwardOutput(self.forwardOutput)
