@@ -12,8 +12,7 @@ class Net(object):
         self.lossLayer = None
         self.fullyConnectedLayers = []
 
-    def CreateDataShape(self, inputSample, batchSize):
-        self.dataShape.batchSize = batchSize
+    def CreateDataShape(self, inputSample):
         if len(inputSample.shape) == 1:
             self.dataShape.channels = 1
             self.dataShape.height = inputSample[0]
@@ -27,12 +26,13 @@ class Net(object):
             self.dataShape.height = inputSample.shape[0]
             self.dataShape.width = inputSample.shape[1]
 
-    def CreateLayers(self, layersProperties, lossLayer):
-        self.inputLayer = InputLayer.InputLayer(self.dataShape)
+    def CreateLayers(self, layersProperties, lossLayer, inputSample):
+        self.inputLayer = InputLayer.InputLayer(inputSample)
         if lossLayer == 'EuclideanDistance':
             self.lossLayer = EuclideanDistance.EuclideanDistance()
         for layerProperties in layersProperties:
-            self.fullyConnectedLayers.append(FullyConnectedLayer.FullyConnectedLayer(layerProperties[0], layerProperties[1]))
+            if layerProperties[0] == 'FullyConnected':
+                self.fullyConnectedLayers.append(FullyConnectedLayer.FullyConnectedLayer(layerProperties[1], layerProperties[2], layerProperties[3]))
 
     def ConectLayers(self):
         self.inputLayer.followingLayer = self.fullyConnectedLayers[0]

@@ -11,4 +11,4 @@ class EuclideanDistance(object):
         self.lossOutput = (1.0/(2.0 * self.previousLayer.forwardOutput.shape[0])) * (np.sum(np.square(self.previousLayer.forwardOutput - target)))
 
     def BackwardOutput(self, target):
-        self.backwardoutput = target - self.previousLayer.forwardOutput
+        self.backwardoutput = self.previousLayer.forwardOutput.shape[0] * (target - self.previousLayer.forwardOutput)
