@@ -61,18 +61,17 @@ def parse_args():
 
     return args
 
-def IterNet(net, data, dataDirectory, batchSize, imgColor):
+def PrepareInput(data, dataDirectory, batchSize, imgColor):
     batchData = []
     batchLabels = []
     randomIndexes = np.random.randint(len(data), size=batchSize)
     for index in randomIndexes:
-        batchData.append(cv2.imread(os.path.join(dataDirectory + data[index][0]), imgColor))
+        batchData.append((cv2.imread(os.path.join(dataDirectory + data[index][0]), imgColor) - 127.0)/127.0)
         labels = data[index][1:]
         batchLabels.append([float(label) for label in labels])
     batchLabels = np.asarray(batchLabels)
 
-    net.ForwardPropagation(batchData)
-    net.lossLayer.LossOutput(batchLabels)
+    return (batchData, batchLabels)
 
 def main():
     args = parse_args()
@@ -95,7 +94,8 @@ def main():
     net = Net.Net()
     inputSample = cv2.imread(os.path.join(args.train_dataset_directory + trainData[0][0]), imgColor)
     net.CreateDataShape(inputSample)
-    layersProperties = [('FullyConnected', 100, 'Sigmoid', 0.0), ('FullyConnected', 100, 'Sigmoid', 0.0), ('FullyConnected', 3, None, None)]
+    layersProperties = [('FullyConnected', 100, 'Sigmoid', 0.1),
+                        ('FullyConnected', 3, None, None)]
     net.CreateLayers(layersProperties, 'EuclideanDistance', inputSample)
     net.ConectLayers()
     net.InitializeWeights()
@@ -107,7 +107,16 @@ def main():
     testCounter = 0
 
     for counter in range(0, args.train_iteration):
-        IterNet(net, trainData, args.train_dataset_directory, args.batch_size, imgColor)
+
+        data = PrepareInput(trainData, args.train_dataset_directory, args.batch_size, imgColor)
+        batchData = data[0]
+        batchLabels = data[1]
+
+        net.ForwardPropagation(batchData)
+        net.lossLayer.LossOutput(batchLabels)
+        net.BackwardPropagation(batchLabels)
+        net.ActualizeWeights(0.01)
+
         iterTrainLoss += net.lossLayer.lossOutput
 
         counter += 1
@@ -122,16 +131,31 @@ def main():
 
         if testCounter == args.test_frequency:
             testCounter = 0
+            #accuracy = 0
             for counter in range(0, args.test_iteration):
-                IterNet(net, testData, args.test_dataset_directory, args.batch_size, imgColor)
+
+                data = PrepareInput(testData, args.test_dataset_directory, args.batch_size, imgColor)
+                batchData = data[0]
+                batchLabels = data[1]
+
+                net.ForwardPropagation(batchData)
+                net.lossLayer.LossOutput(batchLabels)
                 iterTestLoss += net.lossLayer.lossOutput
+
+                for batchIndex in range(0, args.batch_size):
+            #        if np.argmax(net.fullyConnectedLayers[-1].forwardOutput[batchIndex]) == np.argmax(batchLabels[batchIndex]):
+            #            accuracy += 1
+                    print("Net: {}".format(net.fullyConnectedLayers[-1].forwardOutput[batchIndex]*255))
+                    print("Label: {}".format(batchLabels[batchIndex]*255))
+
             print('{} test iteration DONE.'.format(args.test_iteration))
             print("Test loss: {}".format(iterTestLoss/args.test_iteration))
+            #print("Accuracy: {}".format(float(accuracy)/(args.test_iteration * args.batch_size)))
             iterTestLoss = 0
 
     if iterTrainLoss != 0:
         print('{} train iteration DONE.'.format(counter))
-        print("Train loss: {}".format(iterTrainLoss/100.0))
+        print("Train loss: {}".format(iterTrainLoss/iterTrainLoss))
 
     #TODO
     if args.test_all:

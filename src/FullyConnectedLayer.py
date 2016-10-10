@@ -9,7 +9,7 @@ class FullyConnectedLayer(object):
         self.activationFunction = activationFunction
         self.bias = bias
         self.forwardOutput = None
-        self.backwardoutput = None
+        self.backwardOutput = None
         self.followingLayer = None
         self.previousLayer = None
         self.weights = None
@@ -22,14 +22,32 @@ class FullyConnectedLayer(object):
 
     def ForwardOutput(self):
         if (len(self.previousLayer.forwardOutput.shape) == 4):
-            if not (self.previousLayer.forwardOutput.shape[1] == 1 and self.previousLayer.forwardOutput.shape[3] == 1):
-                self.forwardOutput = np.dot(self.previousLayer.forwardOutput.reshape(self.previousLayer.forwardOutput.shape[0], 1, -1, 1)[:, 0, :, 0], self.weights)
+            self.forwardOutput = np.dot(self.previousLayer.forwardOutput.reshape(self.previousLayer.forwardOutput.shape[0], -1), self.weights)
         else:
             self.forwardOutput = np.dot(self.previousLayer.forwardOutput, self.weights)
-
         if self.bias is not None:
             self.forwardOutput += self.bias
-
         if self.activationFunction == 'Sigmoid':
             self.forwardOutput = Sigmoid.Sigmoid.ForwardOutput(self.forwardOutput)
-        
+
+    def BackwardOutput(self):
+        self.backwardOutput = np.dot(self.followingLayer.backwardOutput, self.followingLayer.weights.transpose())
+        if self.activationFunction == 'Sigmoid':
+            self.backwardOutput = self.backwardOutput * Sigmoid.Sigmoid.BackwardOutput(self.forwardOutput)
+
+    def ActualizeWeights(self, gamma):
+        #if self.weights.shape[1] == 3:
+        #    print self.ForwardOutput
+
+        for i, backwardColumn in enumerate(self.backwardOutput.transpose()):
+            if (len(self.previousLayer.forwardOutput.shape) == 4):
+                self.weights[:,i] -= gamma * np.sum(backwardColumn.reshape(-1,1) * self.previousLayer.forwardOutput.reshape(self.previousLayer.forwardOutput.shape[0], -1), axis=0)
+            else:
+                self.weights[:,i] -= gamma * np.sum(backwardColumn.reshape(-1,1) * self.previousLayer.forwardOutput, axis=0)
+        if self.bias is not None:
+            self.bias -= gamma * np.sum(self.backwardOutput, axis=0)
+
+        #if self.weights.shape[1] == 3:
+        #    print("Update")
+        #    print self.forwardOutput
+        #    print("**************************")

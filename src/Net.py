@@ -55,3 +55,13 @@ class Net(object):
         self.inputLayer.ForwardOutput(input, self.dataShape)
         for layer in self.fullyConnectedLayers:
             layer.ForwardOutput()
+
+    def BackwardPropagation(self, target):
+        self.lossLayer.BackwardOutput(target)
+        self.fullyConnectedLayers[-1].backwardOutput = self.lossLayer.backwardOutput
+        for layerIndex in range(0, len(self.fullyConnectedLayers) - 1):
+            self.fullyConnectedLayers[len(self.fullyConnectedLayers) - layerIndex - 2].BackwardOutput()
+
+    def ActualizeWeights(self, gamma):
+        for layer in self.fullyConnectedLayers:
+            layer.ActualizeWeights(gamma)
