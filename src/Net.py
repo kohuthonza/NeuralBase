@@ -2,7 +2,9 @@ import DataShape
 import InputLayer
 import FullyConnectedLayer
 import Sigmoid
+import SoftMax
 import EuclideanDistance
+import SoftMaxCrossEntropy
 
 class Net(object):
 
@@ -30,6 +32,8 @@ class Net(object):
         self.inputLayer = InputLayer.InputLayer(inputSample)
         if lossLayer == 'EuclideanDistance':
             self.lossLayer = EuclideanDistance.EuclideanDistance()
+        elif lossLayer == 'SoftMaxCrossEntropy':
+            self.lossLayer = SoftMaxCrossEntropy.SoftMaxCrossEntropy()
         for layerProperties in layersProperties:
             if layerProperties[0] == 'FullyConnected':
                 self.fullyConnectedLayers.append(FullyConnectedLayer.FullyConnectedLayer(layerProperties[1], layerProperties[2], layerProperties[3]))

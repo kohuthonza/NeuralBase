@@ -94,12 +94,11 @@ def main():
     net = Net.Net()
     inputSample = cv2.imread(os.path.join(args.train_dataset_directory + trainData[0][0]), imgColor)
     net.CreateDataShape(inputSample)
-    layersProperties = [('FullyConnected', 100, 'Sigmoid', 0.1),
-                        ('FullyConnected', 3, None, None)]
-    net.CreateLayers(layersProperties, 'EuclideanDistance', inputSample)
+    layersProperties = [('FullyConnected', 500, 'Sigmoid', 0.1),
+                        ('FullyConnected', 3, 'SoftMax', None)]
+    net.CreateLayers(layersProperties, 'SoftMaxCrossEntropy', inputSample)
     net.ConectLayers()
     net.InitializeWeights()
-
 
     iterTrainLoss = 0
     iterTestLoss = 0
@@ -131,7 +130,7 @@ def main():
 
         if testCounter == args.test_frequency:
             testCounter = 0
-            #accuracy = 0
+            accuracy = 0
             for counter in range(0, args.test_iteration):
 
                 data = PrepareInput(testData, args.test_dataset_directory, args.batch_size, imgColor)
@@ -143,14 +142,14 @@ def main():
                 iterTestLoss += net.lossLayer.lossOutput
 
                 for batchIndex in range(0, args.batch_size):
-            #        if np.argmax(net.fullyConnectedLayers[-1].forwardOutput[batchIndex]) == np.argmax(batchLabels[batchIndex]):
-            #            accuracy += 1
-                    print("Net: {}".format(net.fullyConnectedLayers[-1].forwardOutput[batchIndex]*255))
-                    print("Label: {}".format(batchLabels[batchIndex]*255))
+                    if np.argmax(net.fullyConnectedLayers[-1].forwardOutput[batchIndex]) == np.argmax(batchLabels[batchIndex]):
+                        accuracy += 1
+                    print("Net: {}".format(net.fullyConnectedLayers[-1].forwardOutput[batchIndex]))
+                    print("Label: {}".format(batchLabels[batchIndex]))
 
             print('{} test iteration DONE.'.format(args.test_iteration))
             print("Test loss: {}".format(iterTestLoss/args.test_iteration))
-            #print("Accuracy: {}".format(float(accuracy)/(args.test_iteration * args.batch_size)))
+            print("Accuracy: {}".format(float(accuracy)/(args.test_iteration * args.batch_size)))
             iterTestLoss = 0
 
     if iterTrainLoss != 0:

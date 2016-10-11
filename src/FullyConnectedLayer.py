@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import Sigmoid
+import SoftMax
 
 class FullyConnectedLayer(object):
 
@@ -29,6 +30,8 @@ class FullyConnectedLayer(object):
             self.forwardOutput += self.bias
         if self.activationFunction == 'Sigmoid':
             self.forwardOutput = Sigmoid.Sigmoid.ForwardOutput(self.forwardOutput)
+        elif self.activationFunction == 'SoftMax':
+            self.forwardOutput = SoftMax.SoftMax.ForwardOutput(self.forwardOutput)
 
     def BackwardOutput(self):
         self.backwardOutput = np.dot(self.followingLayer.backwardOutput, self.followingLayer.weights.transpose())
