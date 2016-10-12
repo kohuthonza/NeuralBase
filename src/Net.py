@@ -35,9 +35,11 @@ class Net(object):
         elif lossLayer == 'SoftMaxCrossEntropy':
             self.lossLayer = SoftMaxCrossEntropy.SoftMaxCrossEntropy()
         for layerProperties in layersProperties:
-            if layerProperties[0] == 'FullyConnected':
-                self.fullyConnectedLayers.append(FullyConnectedLayer.FullyConnectedLayer(layerProperties[1], layerProperties[2], layerProperties[3]))
-
+            if layerProperties['type'] == 'FullyConnected':
+                self.fullyConnectedLayers.append(FullyConnectedLayer.FullyConnectedLayer(
+                                                layerProperties['numberOfNeurons'],
+                                                layerProperties['activationFunction'],
+                                                layerProperties['bias']))
     def ConectLayers(self):
         self.inputLayer.followingLayer = self.fullyConnectedLayers[0]
         self.fullyConnectedLayers[0].previousLayer = self.inputLayer

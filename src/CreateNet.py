@@ -2,6 +2,8 @@ import cv2
 import sys
 import os
 import argparse
+import json
+import sys
 import numpy as np
 import Net
 
@@ -12,109 +14,168 @@ def parse_args():
 
     parser.add_argument('-n', '--net',
                         type=str,
-                        help='Net properties')
-    parser.add_argument('-ti', '--train-iteration',
-                        required=True,
-                        type=int,
-                        help='Number of train iteration')
-    parser.add_argument('-to', '--train-frequency',
-                        required=True,
-                        type=int,
-                        help='How often output train loss')
-    parser.add_argument('-ei', '--test-iteration',
-                        required=True,
-                        type=int,
-                        help='Number of test iteration')
-    parser.add_argument('-eo', '--test-frequency',
-                        required=True,
-                        type=int,
-                        help='How often run test and output test loss in train iteration')
-    parser.add_argument('-bs', '--batch-size', default=32,
-                        type=int)
-    parser.add_argument('-tf', '--train-dataset-file',
-                        required=True,
-                        help='File with names and labels of data for train.')
-    parser.add_argument('-td', '--train-dataset-directory',
-                        required=True,
-                        help='Directory with data for train.')
-    parser.add_argument('-ef', '--test-dataset-file',
-                        required=True,
-                        help='File with names and labels of data for test.')
-    parser.add_argument('-ed', '--test-dataset-directory',
-                        required=True,
-                        help='Directory with data for test.')
-    parser.add_argument('-m', '--mean',
-                        type=float,
-                        help='Substract mean from data.')
-    parser.add_argument('-s', '--scale',
-                        type=float,
-                        help='Scale images.')
-    parser.add_argument('-g', '--gray-scale',
-                        action='store_true',
-                        help='Load images in grayscale.')
-    parser.add_argument('-ea', '--test-all',
-                        action='store_true',
-                        help='Test net on all data for test.')
-
+                        help='JSON specification of net')
+    parser.add_argument('-t', '--train',
+                        type=str,
+                        help='JSON specification of train process')
 
     args = parser.parse_args()
 
     return args
 
-def PrepareInput(data, dataDirectory, batchSize, imgColor):
-    batchData = []
-    batchLabels = []
+def parseJSONNetSpecification(jsonNetSpecification):
+
+    jsonNetSpecification = json.loads(jsonNetSpecification)
+
+    layersProperties = ['type', 'numberOfNeurons', 'bias', 'activationFunction']
+    layersSpecifications = []
+
+    for jsonLayerSpecification in jsonNetSpecification['layers']:
+        layer = {}
+        for layerProperty in layersProperties:
+            if layerProperty in jsonLayerSpecification:
+                layer[layerProperty] = jsonLayerSpecification[layerProperty]
+                if layerProperty == 'numberOfNeurons':
+                    layer[layerProperty] = int(layer[layerProperty])
+                elif layerProperty == 'bias':
+                    layer[layer] = float(layer[layerProperty])
+            else:
+                if layerProperty == 'type':
+                    sys.exit("JSON net file doesn't specify type of some layer.")
+                elif layerProperty == 'numberOfNeurons':
+                    sys.exit("JSON net file doesn't specify number of neurons in some layer.")
+                layer[layerProperty] = None
+        layersSpecifications.append(layer)
+
+    netSpecification = {}
+    netSpecification['layers'] = layersSpecifications
+
+    if 'lossFunction' in jsonNetSpecification:
+        netSpecification['lossFunction'] = jsonNetSpecification['lossFunction']
+    else:
+        sys.exit("JSON net file doesn't specify loss layer.")
+
+
+    return netSpecification
+
+def parseJSONTrainSpecification(jsonTrainSpecification):
+
+    jsonTrainSpecification = json.loads(jsonNetSpecification)
+
+    trainSpecificationProperties = ['trainData', 'trainLabels',
+                                    'testData', 'testLabels'
+                                    'batchSize',
+                                    'meanData', 'scaleData',
+                                    'meanLabels', 'scaleLabels',
+                                    'grayscale',
+                                    'learningRate',
+                                    'learnignRateDrop', 'dropFrequency',
+                                    'numberOfTrainIterations' 'numberOfTestIterations', 'testFrequency']
+
+    trainSpecification = {}
+
+    for trainProperty in trainSpecificationProperties:
+        if trainProperty in jsonTrainSpecification:
+            trainSpecification[trainProperty] = jsonTrainSpecification[trainProperty]
+            if trainProperty == 'batchSize' or
+               trainProperty == 'dropFrequency' or
+               trainProperty == 'numberOfTrainIterations' or
+               trainProperty == 'numberOfTestIterations' or
+               trainProperty == 'trainOutputFrequency' or
+               trainProperty == 'testFrequency':
+                trainSpecification[trainProperty] = int(trainSpecification[trainProperty])
+            elif trainProperty == 'mean' or
+                 trainProperty == 'scale' or
+                 trainProperty == 'learningRate' or
+                 trainProperty == 'learnignRateDrop':
+                trainSpecification[trainProperty] = float(trainSpecification[trainProperty])
+            elif layerProperty == 'grayscale':
+                if trainSpecification[trainProperty] == 'True' or trainSpecification[trainProperty] == 'true':
+                    trainSpecification[trainProperty] = 0
+                else:
+                    trainSpecification[trainProperty] = 1
+        else:
+            if trainProperty == 'trainData':
+                sys.exit("JSON train file doesn't specify folder with training data.")
+            elif trainProperty == 'trainLabels':
+                sys.exit("JSON train file doesn't specify file with training labels.")
+            elif trainProperty = 'batchSize':
+                trainSpecification[trainProperty] = 32
+            elif trainProperty = 'numberOfTrainIterations':
+                sys.exit("JSON train file doesn't specify number of train iteration.")
+            elif trainProperty = 'learningRate':
+                sys.exit("JSON train file doesn't specify learning rate.")
+            trainSpecification[trainProperty] = None
+
+    return trainSpecification
+
+def PrepareLabels(trainSpecification):
+
+    loadLabels = {}
+
+    for label in ['tarinLabels', 'testLabels']:
+        with open(jsonTrainSpecification[dataset]) as f:
+            loadLabels[datasetLabel] = f.read().splitlines()
+        for dataIndex in range(len(jsonTrainSpecification[dataset])):
+            loadLabels[datasetLabel][dataIndex] = jsonTrainSpecification[datasetLabel][dataIndex].split()
+
+    return loadLabels
+
+def PrepareInput(data, dataDirectory, batchSize, meanData, scaleData, meanLabels, scaleLabels, grayscale):
+    batch = {}
+    batch['dataBatch'] = []
+    batch['labelsBatch'] = []
     randomIndexes = np.random.randint(len(data), size=batchSize)
     for index in randomIndexes:
-        batchData.append((cv2.imread(os.path.join(dataDirectory + data[index][0]), imgColor) - 127.0)/127.0)
+        img = cv2.imread(os.path.join(dataDirectory + data[index][0]), grayscale)
+        if meanData is not None:
+            img -= meanData
+        if scaleData is not None:
+            img = img/scaleData
+        batch['dataBatch'].append(img)
         labels = data[index][1:]
-        batchLabels.append([float(label) for label in labels])
+        labels = [float(tmpLabel) for tmpLabel in labels]
+        if meanLabels is not None:
+            labels -= meanLabels
+        if scaleLabels is not None:
+            labels = label/scaleLabels
+        bacth['labelsBatch'].append(labels)
     batchLabels = np.asarray(batchLabels)
 
-    return (batchData, batchLabels)
+    return batch
 
-def main():
-    args = parse_args()
-
-    with open(args.train_dataset_file) as f:
-        trainData = f.read().splitlines()
-    with open(args.test_dataset_file) as f:
-        testData = f.read().splitlines()
-
-    for dataIndex in range(0, len(trainData)):
-        trainData[dataIndex] = trainData[dataIndex].split()
-    for dataIndex in range(0, len(testData)):
-        testData[dataIndex] = testData[dataIndex].split()
-
-    if args.gray_scale:
-        imgColor = 0
-    else:
-        imgColor = 1
+def CreateNet(netSpecification, inputSample):
 
     net = Net.Net()
-    inputSample = cv2.imread(os.path.join(args.train_dataset_directory + trainData[0][0]), imgColor)
     net.CreateDataShape(inputSample)
-    layersProperties = [('FullyConnected', 500, 'Sigmoid', 0.1),
-                        ('FullyConnected', 3, 'SoftMax', None)]
-    net.CreateLayers(layersProperties, 'SoftMaxCrossEntropy', inputSample)
+    net.CreateLayers(layersSpecifications, jsonNetSpecification['lossFunction'], inputSample)
     net.ConectLayers()
     net.InitializeWeights()
+
+    return net
+
+def TrainNet(trainSpecification, net):
+
+    labels = PrepareLabels(trainSpecification)
 
     iterTrainLoss = 0
     iterTestLoss = 0
     trainCounter = 0
     testCounter = 0
 
-    for counter in range(0, args.train_iteration):
+    for counter in range(0, trainSpecification['numberOfTrainIterations']):
 
-        data = PrepareInput(trainData, args.train_dataset_directory, args.batch_size, imgColor)
-        batchData = data[0]
-        batchLabels = data[1]
+        batch = PrepareInput(labels['trainLabels'],
+                            jsonTrainSpecification['trainData'],
+                            trainSpecification['bacthSize'],
+                            trainSpecification['mean'],
+                            trainSpecification['scale'],
+                            grayscale)
 
-        net.ForwardPropagation(batchData)
-        net.lossLayer.LossOutput(batchLabels)
-        net.BackwardPropagation(batchLabels)
-        net.ActualizeWeights(0.01)
+        net.ForwardPropagation(bacth['dataBatch'])
+        net.lossLayer.LossOutput(batch['labelsBatch'])
+        net.BackwardPropagation(batch['labelsBatch'])
+        net.ActualizeWeights(trainSpecification['learningRate']))
 
         iterTrainLoss += net.lossLayer.lossOutput
 
@@ -122,11 +183,12 @@ def main():
         testCounter += 1
         trainCounter += 1
 
-        if trainCounter == args.train_frequency:
-            trainCounter = 0
-            print('{} train iteration DONE.'.format(counter))
-            print("Train loss: {}".format(iterTrainLoss/args.train_frequency))
-            iterTrainLoss = 0
+        if trainSpecification['trainOutputFrequency'] is not None:
+            if trainCounter == trainSpecification['trainOutputFrequency']:
+                trainCounter = 0
+                print('{} train iteration DONE.'.format(counter))
+                print("Train loss: {}".format(iterTrainLoss/args.train_frequency))
+                iterTrainLoss = 0
 
         if testCounter == args.test_frequency:
             testCounter = 0
@@ -156,13 +218,18 @@ def main():
         print('{} train iteration DONE.'.format(counter))
         print("Train loss: {}".format(iterTrainLoss/iterTrainLoss))
 
-    #TODO
-    if args.test_all:
-        for counter in range(0, len(testData)):
-            IterNet(net, testData, args.test_dataset_directory, args.batch_size, imgColor)
-            iterTestLoss += net.lossLayer.lossOutput
-        print('{} test iteration DONE.'.format(args.test_iteration))
-        print("Test loss: {}".format(iterTestLoss/args.test_iteration))
+
+def main():
+    args = parse_args()
+
+    inputSample = cv2.imread(os.path.join(args.train_dataset_directory + trainData[0][0]), imgColor)
+
+    netSpecification = parseJSONNetSpecification(args.net)
+    net = CreateNet(netSpecification, inputSample)
+
+    trainSpecification = parseJSONTrainSpecification(args.train)
+    net = TrainNet(trainSpecification, net)
+
 
 
 if __name__ == "__main__":
