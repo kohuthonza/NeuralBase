@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="http://www.stud.fit.vutbr.cz/~xkohut08/logo.png"><br><br>
+  <img src=""><br><br>
 </div>
 
 # NeuralBase
