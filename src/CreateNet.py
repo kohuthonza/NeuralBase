@@ -11,43 +11,57 @@ def parse_args():
     print( ' '.join(sys.argv))
 
     parser = argparse.ArgumentParser(epilog="NeuralBase")
-
     parser.add_argument('-n', '--net',
                         type=str,
+                        required=True,
                         help='JSON specification of net')
     parser.add_argument('-t', '--train',
                         type=str,
+                        required=True,
                         help='JSON specification of train process')
-
     args = parser.parse_args()
 
     return args
 
 def parseJSONNetSpecification(jsonNetSpecification):
 
-    jsonNetSpecification = json.loads(jsonNetSpecification)
+    netSpecification = {}
 
     layersProperties = ['type', 'numberOfNeurons', 'bias', 'activationFunction']
     layersSpecifications = []
 
-    for jsonLayerSpecification in jsonNetSpecification['layers']:
-        layer = {}
-        for layerProperty in layersProperties:
-            if layerProperty in jsonLayerSpecification:
-                layer[layerProperty] = jsonLayerSpecification[layerProperty]
-                if layerProperty == 'numberOfNeurons':
-                    layer[layerProperty] = int(layer[layerProperty])
-                elif layerProperty == 'bias':
-                    layer[layer] = float(layer[layerProperty])
-            else:
-                if layerProperty == 'type':
-                    sys.exit("JSON net file doesn't specify type of some layer.")
-                elif layerProperty == 'numberOfNeurons':
-                    sys.exit("JSON net file doesn't specify number of neurons in some layer.")
-                layer[layerProperty] = None
-        layersSpecifications.append(layer)
+    if 'inputSample' in jsonNetSpecification:
+        netSpecification['inputSample'] = jsonNetSpecification['inputSample']
+    else:
+        sys.exit("JSON file does't specify path to input sample.")
+    if 'grayscale' in jsonNetSpecification:
+        if netSpecification[trainProperty] == 'True' or trainSpecification[trainProperty] == 'true':
+            trainSpecification[trainProperty] = 0
+        else:
+            trainSpecification[trainProperty] = 1
+    else:
+        netSpecification['grayscale'] = 1
 
-    netSpecification = {}
+    if 'layers' in jsonNetSpecification:
+        for jsonLayerSpecification in jsonNetSpecification['layers']:
+            layer = {}
+            for layerProperty in layersProperties:
+                if layerProperty in jsonLayerSpecification:
+                    layer[layerProperty] = jsonLayerSpecification[layerProperty]
+                    if layerProperty == 'numberOfNeurons':
+                        layer[layerProperty] = int(layer[layerProperty])
+                    elif layerProperty == 'bias':
+                        layer[layer] = float(layer[layerProperty])
+                else:
+                    if layerProperty == 'type':
+                        sys.exit("JSON net file doesn't specify type of some layer.")
+                    elif layerProperty == 'numberOfNeurons':
+                        sys.exit("JSON net file doesn't specify number of neurons in some layer.")
+                    layer[layerProperty] = None
+            layersSpecifications.append(layer)
+    else:
+        sys.exit("JSON net file doesn't specify layers.")
+
     netSpecification['layers'] = layersSpecifications
 
     if 'lossFunction' in jsonNetSpecification:
@@ -59,8 +73,6 @@ def parseJSONNetSpecification(jsonNetSpecification):
     return netSpecification
 
 def parseJSONTrainSpecification(jsonTrainSpecification):
-
-    jsonTrainSpecification = json.loads(jsonNetSpecification)
 
     trainSpecificationProperties = ['trainData', 'trainLabels',
                                     'testData', 'testLabels'
@@ -77,33 +89,29 @@ def parseJSONTrainSpecification(jsonTrainSpecification):
     for trainProperty in trainSpecificationProperties:
         if trainProperty in jsonTrainSpecification:
             trainSpecification[trainProperty] = jsonTrainSpecification[trainProperty]
-            if trainProperty == 'batchSize' or
-               trainProperty == 'dropFrequency' or
-               trainProperty == 'numberOfTrainIterations' or
-               trainProperty == 'numberOfTestIterations' or
-               trainProperty == 'trainOutputFrequency' or
+            if trainProperty == 'batchSize' or \
+               trainProperty == 'dropFrequency' or \
+               trainProperty == 'numberOfTrainIterations' or \
+               trainProperty == 'numberOfTestIterations' or \
+               trainProperty == 'trainOutputFrequency' or \
                trainProperty == 'testFrequency':
                 trainSpecification[trainProperty] = int(trainSpecification[trainProperty])
-            elif trainProperty == 'mean' or
-                 trainProperty == 'scale' or
-                 trainProperty == 'learningRate' or
+            elif trainProperty == 'mean' or \
+                 trainProperty == 'scale' or \
+                 trainProperty == 'learningRate' or \
                  trainProperty == 'learnignRateDrop':
                 trainSpecification[trainProperty] = float(trainSpecification[trainProperty])
-            elif layerProperty == 'grayscale':
-                if trainSpecification[trainProperty] == 'True' or trainSpecification[trainProperty] == 'true':
-                    trainSpecification[trainProperty] = 0
-                else:
-                    trainSpecification[trainProperty] = 1
+
         else:
             if trainProperty == 'trainData':
                 sys.exit("JSON train file doesn't specify folder with training data.")
             elif trainProperty == 'trainLabels':
                 sys.exit("JSON train file doesn't specify file with training labels.")
-            elif trainProperty = 'batchSize':
+            elif trainProperty == 'batchSize':
                 trainSpecification[trainProperty] = 32
-            elif trainProperty = 'numberOfTrainIterations':
+            elif trainProperty == 'numberOfTrainIterations':
                 sys.exit("JSON train file doesn't specify number of train iteration.")
-            elif trainProperty = 'learningRate':
+            elif trainProperty == 'learningRate':
                 sys.exit("JSON train file doesn't specify learning rate.")
             trainSpecification[trainProperty] = None
 
@@ -144,9 +152,10 @@ def PrepareInput(data, dataDirectory, batchSize, meanData, scaleData, meanLabels
 
     return batch
 
-def CreateNet(netSpecification, inputSample):
+def CreateNet(netSpecification):
 
     net = Net.Net()
+    inputSample = cv2.imread(inputSample, netSpecification['grayscale'])
     net.CreateDataShape(inputSample)
     net.CreateLayers(layersSpecifications, jsonNetSpecification['lossFunction'], inputSample)
     net.ConectLayers()
@@ -161,76 +170,121 @@ def TrainNet(trainSpecification, net):
     iterTrainLoss = 0
     iterTestLoss = 0
     trainCounter = 0
+    outputTrainCounter = 0
     testCounter = 0
+    dropFrequencyCounter = 0
 
-    for counter in range(0, trainSpecification['numberOfTrainIterations']):
-
+    for trainCounter in range(trainSpecification['numberOfTrainIterations']):
         batch = PrepareInput(labels['trainLabels'],
-                            jsonTrainSpecification['trainData'],
+                            trainSpecification['trainData'],
                             trainSpecification['bacthSize'],
-                            trainSpecification['mean'],
-                            trainSpecification['scale'],
+                            trainSpecification['meanData'],
+                            trainSpecification['scaleData'],
+                            trainSpecification['meanLabels'],
+                            trainSpecification['scaleLabels'],
                             grayscale)
 
         net.ForwardPropagation(bacth['dataBatch'])
         net.lossLayer.LossOutput(batch['labelsBatch'])
         net.BackwardPropagation(batch['labelsBatch'])
-        net.ActualizeWeights(trainSpecification['learningRate']))
+        net.ActualizeWeights(trainSpecification['learningRate'])
 
         iterTrainLoss += net.lossLayer.lossOutput
 
-        counter += 1
-        testCounter += 1
         trainCounter += 1
+        testCounter += 1
+        outputTrainCounter += 1
+
+        if trainSpecification['dropFrequency'] is not None:
+            dropFrequencyCounter += 1
+            if trainSpecification['dropFrequency'] == dropFrequencyCounter:
+                trainSpecification['learningRate'] *= trainSpecification['learnignRateDrop']
+                dropFrequencyCounter = 0
 
         if trainSpecification['trainOutputFrequency'] is not None:
-            if trainCounter == trainSpecification['trainOutputFrequency']:
-                trainCounter = 0
+            if trainSpecification['trainOutputFrequency'] == outputTrainCounter:
+                outputTrainCounter = 0
+                print("")
+                print("")
                 print('{} train iteration DONE.'.format(counter))
-                print("Train loss: {}".format(iterTrainLoss/args.train_frequency))
+                print("Train loss: {}".format(iterTrainLoss/trainSpecification['trainOutputFrequency']))
                 iterTrainLoss = 0
 
-        if testCounter == args.test_frequency:
-            testCounter = 0
-            accuracy = 0
-            for counter in range(0, args.test_iteration):
+        if trainSpecification['testFrequency'] is not None:
+            if testCounter == trainSpecification['testFrequency']:
+                testCounter = 0
+                accuracy = 0
+                print("")
+                print("")
+                print('********************************************')
+                print('Testing net...')
+                for counter in range(trainSpecification['numberOfTestIterations']):
+                    batch = PrepareInput(labels['testLabels'],
+                                        jsonTrainSpecification['testData'],
+                                        trainSpecification['bacthSize'],
+                                        trainSpecification['meanData'],
+                                        trainSpecification['scaleData'],
+                                        trainSpecification['meanLabels'],
+                                        trainSpecification['scaleLabels'],
+                                        grayscale)
 
-                data = PrepareInput(testData, args.test_dataset_directory, args.batch_size, imgColor)
-                batchData = data[0]
-                batchLabels = data[1]
+                    net.ForwardPropagation(batch['dataBatch'])
+                    net.lossLayer.LossOutput(batch['labelsBatch'])
+                    iterTestLoss += net.lossLayer.lossOutput
 
-                net.ForwardPropagation(batchData)
-                net.lossLayer.LossOutput(batchLabels)
-                iterTestLoss += net.lossLayer.lossOutput
+                    for batchIndex in range(trainSpecification['batchSize']):
+                        if trainSpecification['lossLayer'] == 'SoftMaxCrossEntropy':
+                            if np.argmax(net.fullyConnectedLayers[-1].forwardOutput[batchIndex]) == np.argmax(batchLabels[batchIndex]):
+                                accuracy += 1
+                print('____________________________________________')
+                print('Last batch from training set:')
+                print("Net: {}".format(net.fullyConnectedLayers[-1].forwardOutput[batchIndex]))
+                print("Label: {}".format(batchLabels[batchIndex]))
+                print('{} test iteration DONE.'.format(trainSpecification['numberOfTestIterations']))
+                if trainSpecification['lossLayer'] == 'SoftMaxCrossEntropy':
+                    print("Accuracy: {}".format(float(accuracy)/(trainSpecification['numberOfTestIterations'] * trainSpecification['bacthSize'])))
+                else:
+                    print("Test loss: {}".format(iterTestLoss/trainSpecification['numberOfTestIterations']))
 
-                for batchIndex in range(0, args.batch_size):
-                    if np.argmax(net.fullyConnectedLayers[-1].forwardOutput[batchIndex]) == np.argmax(batchLabels[batchIndex]):
-                        accuracy += 1
-                    print("Net: {}".format(net.fullyConnectedLayers[-1].forwardOutput[batchIndex]))
-                    print("Label: {}".format(batchLabels[batchIndex]))
-
-            print('{} test iteration DONE.'.format(args.test_iteration))
-            print("Test loss: {}".format(iterTestLoss/args.test_iteration))
-            print("Accuracy: {}".format(float(accuracy)/(args.test_iteration * args.batch_size)))
-            iterTestLoss = 0
+                iterTestLoss = 0
 
     if iterTrainLoss != 0:
-        print('{} train iteration DONE.'.format(counter))
-        print("Train loss: {}".format(iterTrainLoss/iterTrainLoss))
+        print('{} train iteration DONE.'.format(outputTrainCounter))
+        print("Train loss: {}".format(iterTrainLoss/outputTrainCounter))
 
 
 def main():
     args = parse_args()
 
-    inputSample = cv2.imread(os.path.join(args.train_dataset_directory + trainData[0][0]), imgColor)
+    with open(args.net) as jsonFile:
+        jsonNetSpecification = json.load(jsonFile)
+    with open(args.train) as jsonFile:
+        jsonTrainSpecification = json.load(jsonFile)
 
-    netSpecification = parseJSONNetSpecification(args.net)
-    net = CreateNet(netSpecification, inputSample)
+    print("")
+    print("")
+    print('********************************************')
+    print('Net specification')
+    print('********************************************')
+    print("")
+    print json.dumps(jsonNetSpecification, indent=2, sort_keys=False)
+    print("")
+    print("")
+    print("")
+    print('********************************************')
+    print('Train specification')
+    print('********************************************')
+    print("")
+    print json.dumps(jsonTrainSpecification, indent=2, sort_keys=False)
+    print("")
+    print("")
+    print("")
 
-    trainSpecification = parseJSONTrainSpecification(args.train)
-    net = TrainNet(trainSpecification, net)
+    netSpecification = parseJSONNetSpecification(jsonNetSpecification)
+    trainSpecification = parseJSONTrainSpecification(jsonTrainSpecification)
 
-
+    #net = CreateNet(netSpecification)
+    #net = TrainNet(trainSpecification, net)
 
 if __name__ == "__main__":
     main()
