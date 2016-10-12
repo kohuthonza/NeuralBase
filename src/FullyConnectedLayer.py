@@ -14,7 +14,7 @@ class FullyConnectedLayer(object):
         self.followingLayer = None
         self.previousLayer = None
         self.weights = None
-
+    
     def InitializeWeights(self):
         variance = 2.0/(self.previousLayer.numberOfNeurons + self.numberOfNeurons)
         self.weights = np.random.uniform(-variance, variance, (self.previousLayer.numberOfNeurons, self.numberOfNeurons))

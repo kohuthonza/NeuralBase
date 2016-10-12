@@ -6,6 +6,7 @@ import json
 import sys
 from collections import OrderedDict
 import numpy as np
+import pickle
 import Net
 
 def parse_args():
@@ -20,6 +21,9 @@ def parse_args():
                         type=str,
                         required=True,
                         help='JSON specification of train process')
+    parser.add_argument('-o', '--output',
+                        type=str,
+                        help='Name of net to be saved')
     args = parser.parse_args()
 
     return args
@@ -254,6 +258,8 @@ def TrainNet(trainSpecification, netSpecification, net):
         print("Train loss: {}".format(iterTrainLoss/outputTrainCounter))
 
 
+    return net
+
 def main():
     args = parse_args()
 
@@ -286,6 +292,12 @@ def main():
 
     net = CreateNet(netSpecification)
     net = TrainNet(trainSpecification, netSpecification, net)
+
+    if args.output is not None:
+        f = open(args.output + ".bn", "wb")
+        pickle.dump(net, f)
+        f.close()
+
 
 if __name__ == "__main__":
     main()
