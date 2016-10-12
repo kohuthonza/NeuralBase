@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="https://www.tensorflow.org/images/tf_logo_transp.png"><br><br>
+  <img src="http://www.stud.fit.vutbr.cz/~xkohut08/logo.png"><br><br>
 </div>
 
 # NeuralBase
