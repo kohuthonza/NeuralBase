@@ -201,7 +201,7 @@ Train
     <td>How often is test procced and outputed  (train iterations).</td>
   </tr>
 </table>
-
+<br>
 <h2>
 Serialization
 </h2>
