@@ -10,7 +10,6 @@ Arguments
 <h3>
 CreateNet.py
 </h3>
-<br>
 --net, -n
 <br>
 --train, -t
