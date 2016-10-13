@@ -33,13 +33,21 @@ CreateNet.py
   </tr>
 </table>
 <br>
-<br>
+
 <h3>
 JSON definitions
 </h3>
-
 <h4>
 Net
 </h4>
 
+{"inputSample":"/dir/data",
+ "grayscale":"False",
+ "layers":[
+          {"type":"FullyConnected", 
+           "numberOfNeurons":"100",
+           "bias":"0.1", 
+           "activationFunction":"Sigmoid"},
+          ],
+ "lossFunction":"SoftMaxCrossEntropy"}
 
