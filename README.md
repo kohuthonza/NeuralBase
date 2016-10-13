@@ -179,7 +179,7 @@ Train
   </tr>
   <tr>
     <td><b>scaleData</b> (optional)</td> 
-    <td>Data are multiplied by scaleData (float).</td>
+    <td>Data are divided by scaleData (float).</td>
   </tr>
   <tr>
     <td><b>meanLabels</b> (optional)</td> 
@@ -187,7 +187,7 @@ Train
   </tr>
   <tr>
     <td><b>scaleLabels</b> (optional)</td> 
-    <td>Labels are multiplied by scaleLabels.</td>
+    <td>Labels are divided by scaleLabels.</td>
   </tr>
   <tr>
     <td><b>learningRate</b></td> 
