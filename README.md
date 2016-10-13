@@ -34,6 +34,22 @@ CreateNet.py
 </table>
 <br>
 
+<h3>
+Usage
+</h3>
+
+<h4>
+Create new net
+</h4>
+
+python CreateNet.py --net net.json --train --train.json --output newNet.nb
+
+<h4>
+Finetuning
+</h4>
+
+python CreateNet.py --train train.json --input net.nb --output newNet.nb
+
 <h2>
 JSON definitions
 </h2>
@@ -202,19 +218,20 @@ Train
   </tr>
 </table>
 <br>
+
 <h2>
-Serialization
+Datasets
 </h2>
 
 <h3>
-Create new net
+MNIST
 </h3>
 
-python CreateNet.py --net net.json --train --train.json --output newNet.nb
+Require https://github.com/sorki/python-mnist 
 
 <h3>
-Finetuning
+Basic objects
 </h3>
 
-python CreateNet.py --train train.json --input net.nb --output newNet.nb
+
 
