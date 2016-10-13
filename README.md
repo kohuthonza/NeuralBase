@@ -254,10 +254,10 @@ Create folder of images for training and testing. Every image has to be labeled.
 <br>
 Sample of label file for training with euclidean distance loss function:<br>
 ```
-testRGB_0.png 0.419608 0.541176 0.011765
-testRGB_1.png 0.800000 0.376471 0.109804
-testRGB_2.png 0.070588 0.349020 0.623529
-testRGB_3.png 0.262745 0.376471 0.015686
+test_0.png 0.419608 0.541176 0.011765
+test_1.png 0.800000 0.376471 0.109804
+test_2.png 0.070588 0.349020 0.623529
+test_3.png 0.262745 0.376471 0.015686
 ```
 <br>
 Sample of label file for training with softmax and cross entropy loss function (3 classes):<br>
