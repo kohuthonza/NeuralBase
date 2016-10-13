@@ -17,3 +17,15 @@ CreateNet.py
 --output, -o - Name of the net to be saved.
 <br>
 --input, -i - Name of the net to be load.
+<table style="width:50%">
+  <tr>
+    <td>--net, -n</td>
+    <td>-</td>
+    <td>JSON specification of the net.</td>
+  </tr>
+  <tr>
+    <td>Eve</td>
+    <td>Jackson</td>
+    <td>Jackson</td>
+  </tr>
+</table>
