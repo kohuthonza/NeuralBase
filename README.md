@@ -17,11 +17,11 @@ CreateNet.py
   </tr>
   <tr>
     <td>--net, -n</td>
-    <td>JSON specification of the net.</td>
+    <td>JSON definition of the net.</td>
   </tr>
   <tr>
     <td>--train, -t</td> 
-    <td>JSON specification of the training process.</td>
+    <td>JSON definition of the training process.</td>
   </tr>
   <tr>
     <td>--output, -o</td> 
@@ -32,3 +32,13 @@ CreateNet.py
     <td>Name of the net to be load.</td>
   </tr>
 </table>
+
+<h3>
+JSON definitions
+</h3>
+
+<h4>
+Net
+</h4>
+
+
