@@ -16,7 +16,7 @@ CreateNet.py
     <th>Description</th>
   </tr>
   <tr>
-    <td>--net, -n</td>
+    <td><b>--net, -n</b></td>
     <td>JSON definition of the net.</td>
   </tr>
   <tr>
