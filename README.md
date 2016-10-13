@@ -32,12 +32,12 @@ CreateNet.py
     <td>Name of the net to be load.</td>
   </tr>
 </table>
-
+<br>
+<br>
 <h3>
 JSON definitions
 </h3>
-<br>
-<br>
+
 <h4>
 Net
 </h4>
