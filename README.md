@@ -37,12 +37,13 @@ CreateNet.py
 <h3>
 JSON definitions
 </h3>
+
 <h4>
 Net
 </h4>
 
 ```json
-{"inputSample":"/dir/data",
+{"inputSample":"/dir/trainData/train_0.png",
  "grayscale":"False",
  "layers":[
           {"type":"FullyConnected", 
@@ -52,5 +53,51 @@ Net
           ],
  "lossFunction":"SoftMaxCrossEntropy"}
 ```
+<table style="width:50%">
+   <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td>inputSample</td>
+    <td>Path to train file.</td>
+  </tr>
+  <tr>
+    <td>grayscale (optinal, default=False)</td> 
+    <td>Load images in grayscale.</td>
+  </tr>
+  <tr>
+    <td>layers</td> 
+    <td>List of layers definitions.</td>
+  </tr>
+   <tr>
+    <td>lossFunction</td> 
+    <td>Loss function of the net.</td>
+  </tr>
+</table>
+<br>
 
+
+<h4>
+Train 
+</h4>
+
+```json
+{"trainData":"/dir/trainData",
+ "trainLabels":"/dir/train.txt",
+ "testData":"/dir/testData",
+ "testLabels":"/dir/test.txt",
+
+ "batchSize":"32",
+
+ "dataMean":"127.0",
+ "dataScale":"127.0",
+
+ "learningRate":"0.001",
+
+ "numberOfTrainIterations":"500",
+ "trainOutputFrequency":"20",
+ "numberOfTestIterations":"10",
+ "testOutputFrequency":"100"}
+```
 
