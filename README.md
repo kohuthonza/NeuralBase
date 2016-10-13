@@ -50,6 +50,9 @@ Net
            "numberOfNeurons":"100",
            "bias":"0.1", 
            "activationFunction":"Sigmoid"},
+          {"type":"FullyConnected", 
+          "numberOfNeurons":"3", 
+          "activationFunction":"SoftMax"} 
           ],
  "lossFunction":"SoftMaxCrossEntropy"}
 ```
@@ -151,51 +154,51 @@ Train
   </tr>
   <tr>
     <td><b>batchSize</b></td> 
-    <td>Number of data to be procced at once.</td>
+    <td>Number of data to be procced at once (integer).</td>
   </tr>
   <tr>
-    <td><b>meanData (optional, float)</b></td> 
-    <td>Value substracted from images.</td>
+    <td><b>meanData</b> (optional)</td> 
+    <td>Value substracted from images (float).</td>
   </tr>
   <tr>
-    <td><b>scaleData (optional, float)</b></td> 
-    <td>Data are multiplied by scaleData.</td>
+    <td><b>scaleData</b> (optional)</td> 
+    <td>Data are multiplied by scaleData (float).</td>
   </tr>
   <tr>
-    <td><b>meanLabels (optional, float)</b></td> 
-    <td>Value substracted from labels.</td>
+    <td><b>meanLabels</b> (optional)</td> 
+    <td>Value substracted from labels (float).</td>
   </tr>
   <tr>
-    <td><b>scaleLabels (optional, float)</b></td> 
+    <td><b>scaleLabels</b> (optional)</td> 
     <td>Labels are multiplied by scaleLabels.</td>
   </tr>
   <tr>
-    <td><b>learningRate (float)</b></td> 
-    <td>Learning rate for gradient descent.</td>
+    <td><b>learningRate</b></td> 
+    <td>Learning rate for gradient descent (float).</td>
   </tr>
   <tr>
-    <td><b>learningRateDrop (float)</b></td> 
-    <td>Learning rate is multiply by learningRateDrop every dropFrequency.</td>
+    <td><b>learningRateDrop</b> (optional)</td> 
+    <td>Learning rate is multiply by learningRateDrop every dropFrequency (float).</td>
   </tr>
   <tr>
-    <td><b>dropFrequency (train iterations)</b></td> 
-    <td>Define how often is learning rate decreased.</td>
+    <td><b>dropFrequency</b> (optional)</td> 
+    <td>Define how often is learning rate decreased (train iterations).</td>
   </tr>
   <tr>
-    <td><b>numberOfTrainIterations (integer)</b></td> 
-    <td>Number of iterations.</td>
+    <td><b>numberOfTrainIterations</b></td> 
+    <td>Number of iterations (integer).</td>
   </tr>
   <tr>
-    <td><b>trainOutputFrequency (iteration)</b></td> 
-    <td>How often is train loss outputed.</td>
+    <td><b>trainOutputFrequency</b> (optional)</td> 
+    <td>How often is train loss outputed (train iterations).</td>
   </tr>
   <tr>
-    <td><b>numberOfTestIterations (integer)</b></td> 
-    <td>Number of test iterations.</td>
+    <td><b>numberOfTestIterations</b> (optional)</td> 
+    <td>Number of test iterations (integer).</td>
   </tr>
   <tr>
-    <td><b>testOutputFrequency (iteration)</b></td> 
-    <td>How often is test procced and outputed.</td>
+    <td><b>testOutputFrequency</b> (optional)</td> 
+    <td>How often is test procced and outputed  (train iterations).</td>
   </tr>
 </table>
 
