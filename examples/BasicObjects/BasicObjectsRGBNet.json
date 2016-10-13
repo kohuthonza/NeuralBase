@@ -1,0 +1,6 @@
+{"inputSample":"PATH_TO_SAMPLE_FROM_DATASET",
+ "layers":[
+{"type":"FullyConnected", "numberOfNeurons":"100", "bias":"0.1", "activationFunction":"Sigmoid"},
+{"type":"FullyConnected", "numberOfNeurons":"3"}
+       ],
+ "lossFunction":"EuclideanDistance"}

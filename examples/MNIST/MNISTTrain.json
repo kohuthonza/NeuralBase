@@ -1,0 +1,16 @@
+{"trainData":"PATH_TO_FOLDER_WITH_TRAIN_DATA",
+ "trainLabels":"PATH_TO_FILE_WITH_TRAIN_LABELS",
+ "testData":"PATH_TO_FOLDER_WITH_TEST_DATA",
+ "testLabels":"PATH_TO_FILE_WITH_TEST_LABELS",
+
+ "batchSize":"32",
+
+ "dataMean":"127.0",
+ "dataScale":"127.0",
+
+ "learningRate":"0.0001",
+
+ "numberOfTrainIterations":"500",
+ "trainOutputFrequency":"20",
+ "numberOfTestIterations":"10",
+ "testOutputFrequency":"100"}

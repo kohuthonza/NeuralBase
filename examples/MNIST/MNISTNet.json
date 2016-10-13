@@ -1,0 +1,7 @@
+{"inputSample":"PATH_TO_SAMPLE_FROM_DATASET",
+ "grayscale":"True",
+ "layers":[
+{"type":"FullyConnected", "numberOfNeurons":"200", "bias":"0.1", "activationFunction":"Sigmoid"},
+{"type":"FullyConnected", "numberOfNeurons":"10", "activationFunction":"SoftMax"}
+       ],
+ "lossFunction":"SoftMaxCrossEntropy"}
