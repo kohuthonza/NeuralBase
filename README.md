@@ -227,7 +227,7 @@ Datasets
 <h3>
 MNIST
 </h3>
-Require https://github.com/sorki/python-mnist to be installed. Run loadMNIST.py in directory with MNIST (http://yann.lecun.com/exdb/mnist/) ubyte files.
+Require [python-mnist](https://github.com/sorki/python-mnist) to be installed. Run loadMNIST.py in directory with [MNIST](http://yann.lecun.com/exdb/mnist/) ubyte files.
  
 <h4>
 Usage
@@ -253,19 +253,20 @@ Create folder of images for training and testing. Every image has to be labeled.
 <br>
 <br>
 Sample of label file for training with euclidean distance loss function:<br>
-<br>
-> testRGB_0.png 0.419608 0.541176 0.011765<br>
-> testRGB_1.png 0.800000 0.376471 0.109804<br>
-> testRGB_2.png 0.070588 0.349020 0.623529<br>
-> testRGB_3.png 0.262745 0.376471 0.015686<br>
+```
+testRGB_0.png 0.419608 0.541176 0.011765<br>
+testRGB_1.png 0.800000 0.376471 0.109804<br>
+testRGB_2.png 0.070588 0.349020 0.623529<br>
+testRGB_3.png 0.262745 0.376471 0.015686<br>
+```
 <br>
 Sample of label file for training with softmax and cross entropy loss function (3 classes):<br>
-<br>
-> test_0.png 0.000000 1.000000 0.000000<br>
-> test_1.png 0.000000 1.000000 0.000000<br>
-> test_2.png 0.000000 1.000000 0.000000<br>
-> test_3.png 0.000000 0.000000 1.000000
-
+```
+test_0.png 0.000000 1.000000 0.000000<br>
+test_1.png 0.000000 1.000000 0.000000<br>
+test_2.png 0.000000 1.000000 0.000000<br>
+test_3.png 0.000000 0.000000 1.000000
+```
 
 
 
