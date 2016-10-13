@@ -10,10 +10,10 @@ Arguments
 <h3>
 CreateNet.py
 </h3>
---net, -n
+--net, -n - JSON specification of the net.
 <br>
---train, -t
+--train, -t JSON specification of the training process.
 <br>
---output, -o
+--output, -o - Name of the net to be saved.
 <br>
---input, -i
+--input, -i - Name of the net to be load.
