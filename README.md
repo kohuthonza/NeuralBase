@@ -40,15 +40,15 @@ Usage
 <h4>
 Create new net
 </h4>
-
+```
 python CreateNet.py --net net.json --train --train.json --output newNet.nb
-
+```
 <h4>
 Finetuning
 </h4>
-
+```
 python CreateNet.py --train train.json --input net.nb --output newNet.nb
-
+```
 <br>
 
 <h2>
@@ -232,7 +232,9 @@ Require [python-mnist](https://github.com/sorki/python-mnist) to be installed. R
 <h4>
 Usage
 </h4>
+```
 python loadMNIST.py
+```
 <br>
 <h3>
 Basic objects
@@ -242,8 +244,10 @@ Generate basic objects of random color.
 <h4>
 Usage
 </h4>
+```
 python GeneratorBasicObjects.py --size 32 --super-size 128 --min-size 80 --train-size 20000 --test-size 2000 --type 
 python GeneratorBasicObjects.py --size 32 --super-size 128 --min-size 80 --train-size 20000 --test-size 2000 --color
+```
 <br>
 <h3>
 Try it yourself!
