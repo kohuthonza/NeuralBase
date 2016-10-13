@@ -97,17 +97,14 @@ Types of layers
     <td>Bias (float).</td>
   </tr>
    <tr>
-    <td><b>activationFunction</b></td> 
+    <td><b>activationFunction</b> (optional)</td> 
     <td>Activation function (Sigmoid, SoftMax).</td>
   </tr>
 </table>
 
-
-
 <h3>
 Train 
 </h3>
-
 ```json
 {"trainData":"/dir/trainData",
  "trainLabels":"/dir/train.txt",
@@ -116,14 +113,92 @@ Train
 
  "batchSize":"32",
 
- "dataMean":"127.0",
- "dataScale":"127.0",
-
+ "meanData":"127.0",
+ "scaleData":"127.0",
+ "meanLabels":"0.5",
+ "scaleLabels":"2.0",
+ 
  "learningRate":"0.001",
+ "learningRateDrop":"0.5",
+ "dropFrequency":"1000",
 
- "numberOfTrainIterations":"500",
+ "numberOfTrainIterations":"10000",
  "trainOutputFrequency":"20",
  "numberOfTestIterations":"10",
  "testOutputFrequency":"100"}
 ```
+
+<table style="width:50%">
+   <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
+    <td><b>trainData</b></td>
+    <td>Path to folder with train data.</td>
+  </tr>
+  <tr>
+     <td><b>trainLabels</b></td>
+    <td>Path to file with train labels.</td>
+  </tr>
+  <tr>
+    <td><b>testData</b></td>
+    <td>Path to folder with test data.</td>
+  </tr>
+  <tr>
+     <td><b>testLabels</b></td>
+    <td>Path to file with test labels.</td>
+  </tr>
+  <tr>
+    <td><b>batchSize</b></td> 
+    <td>Number of data to be procced at once.</td>
+  </tr>
+  <tr>
+    <td><b>meanData (optional, float)</b></td> 
+    <td>Value substracted from images.</td>
+  </tr>
+  <tr>
+    <td><b>scaleData (optional, float)</b></td> 
+    <td>Data are multiplied by scaleData.</td>
+  </tr>
+  <tr>
+    <td><b>meanLabels (optional, float)</b></td> 
+    <td>Value substracted from labels.</td>
+  </tr>
+  <tr>
+    <td><b>scaleLabels (optional, float)</b></td> 
+    <td>Labels are multiplied by scaleLabels.</td>
+  </tr>
+  <tr>
+    <td><b>learningRate (float)</b></td> 
+    <td>Learning rate for gradient descent.</td>
+  </tr>
+  <tr>
+    <td><b>learningRateDrop (float)</b></td> 
+    <td>Learning rate is multiply by learningRateDrop every dropFrequency.</td>
+  </tr>
+  <tr>
+    <td><b>dropFrequency (train iterations)</b></td> 
+    <td>Define how often is learning rate decreased.</td>
+  </tr>
+  <tr>
+    <td><b>numberOfTrainIterations (integer)</b></td> 
+    <td>Number of iterations.</td>
+  </tr>
+  <tr>
+    <td><b>trainOutputFrequency (iteration)</b></td> 
+    <td>How often is train loss outputed.</td>
+  </tr>
+  <tr>
+    <td><b>numberOfTestIterations (integer)</b></td> 
+    <td>Number of test iterations.</td>
+  </tr>
+  <tr>
+    <td><b>testOutputFrequency (iteration)</b></td> 
+    <td>How often is test procced and outputed.</td>
+  </tr>
+</table>
+
+
+
 
