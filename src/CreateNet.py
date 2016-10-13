@@ -99,8 +99,10 @@ def parseJSONTrainSpecification(jsonTrainSpecification):
                trainProperty == 'trainOutputFrequency' or \
                trainProperty == 'testOutputFrequency':
                 trainSpecification[trainProperty] = int(trainSpecification[trainProperty])
-            elif trainProperty == 'mean' or \
-                 trainProperty == 'scale' or \
+            elif trainProperty == 'meanData' or \
+                 trainProperty == 'scaleData' or \
+                 trainProperty == 'meanLabels' or \
+                 trainProperty == 'scaleLabels' or \
                  trainProperty == 'learningRate' or \
                  trainProperty == 'learnignRateDrop':
                 trainSpecification[trainProperty] = float(trainSpecification[trainProperty])
@@ -138,6 +140,7 @@ def PrepareInput(dataLabels, dataDirectory, batchSize, meanData, scaleData, mean
     randomIndexes = np.random.randint(len(dataLabels), size=batchSize)
     for index in randomIndexes:
         img = cv2.imread(os.path.join(dataDirectory, dataLabels[index][0]), grayscale)
+        img = img.astype(float)
         if meanData is not None:
             img -= meanData
         if scaleData is not None:

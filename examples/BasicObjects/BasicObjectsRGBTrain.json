@@ -8,7 +8,7 @@
  "meanData":"127.0",
  "scaleData":"127.0",
 
- "learningRate":"0.001",
+ "learningRate":"0.01",
 
  "numberOfTrainIterations":"500",
  "trainOutputFrequency":"20",

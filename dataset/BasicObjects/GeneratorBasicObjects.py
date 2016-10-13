@@ -300,7 +300,10 @@ def create_set(obj_type):
         cv2.imwrite(os.path.join(dir, dir + '_%d.png' % x), img)
 
 
-        f.write('%s_%d.png %f %f %f' % (dir, x, cir, sqr, tri))
+        f.write('%s_%d.png' % (dir, x))
+
+        if args['type']:
+            f.write(' %f %f %f' % (cir, sqr, tri))
 
         if args['colour']:
             f.write(' %f %f %f' % (float(R)/255.0, float(G)/255.0, float(B)/255.0))
@@ -327,12 +330,13 @@ def create_set(obj_type):
 
 args_parser = argparse.ArgumentParser(description='Generovani jednoduchych objektu')
 args_parser.add_argument('-s','--size', type = int, help = 'Sirka a vyska vysledneho obrazku v px', required=True)
-args_parser.add_argument('-ss','--super_size', type = int, help = 'Sirka a vyska obrazku pro supersampling px (musi byt vetsi nez velikost vysledneho obrazku)', default=256, required=False)
-args_parser.add_argument('-ms','--min_size', type = int, help = 'Minimalni velikost objektu (musi byt mensi, nebo stejna, jako velikost obrazku)', default=50, required=False)
-args_parser.add_argument('-to','--train_out', type = str, help = 'Nazev slozky, do ktere budou ulozeny obrazky train',default='train', required=False)
-args_parser.add_argument('-t','--train_size', type = int, help = 'Pocet trenovacich dat', required=False)
-args_parser.add_argument('-teo','--test_out', type = str, help = 'Nazev slozky, do ktere budou ulozeny obrazky test',default='test', required=False)
-args_parser.add_argument('-te','--test_size', type = int, help = 'Pocet testovacich dat', required=False)
+args_parser.add_argument('-ss','--super-size', type = int, help = 'Sirka a vyska obrazku pro supersampling px (musi byt vetsi nez velikost vysledneho obrazku)', default=256, required=False)
+args_parser.add_argument('-ms','--min-size', type = int, help = 'Minimalni velikost objektu (musi byt mensi, nebo stejna, jako velikost obrazku)', default=50, required=False)
+args_parser.add_argument('-to','--train-out', type = str, help = 'Nazev slozky, do ktere budou ulozeny obrazky train',default='train', required=False)
+args_parser.add_argument('-t','--train-size', type = int, help = 'Pocet trenovacich dat', required=False)
+args_parser.add_argument('-teo','--test-out', type = str, help = 'Nazev slozky, do ktere budou ulozeny obrazky test',default='test', required=False)
+args_parser.add_argument('-te','--test-size', type = int, help = 'Pocet testovacich dat', required=False)
+args_parser.add_argument('-y','--type', help = 'Prida udaj o typu', action="store_true", required=False)
 args_parser.add_argument('-c','--colour', help = 'Prida udaj o barve', action="store_true", required=False)
 args_parser.add_argument('-p','--position', help = 'Prida udaj o pozici', action="store_true", required=False)
 args_parser.add_argument('-z','--zoom', help = 'Prida udaj o velikosti', action="store_true", required=False)

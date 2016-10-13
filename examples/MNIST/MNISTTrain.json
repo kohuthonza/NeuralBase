@@ -5,10 +5,10 @@
 
  "batchSize":"32",
 
- "dataMean":"127.0",
- "dataScale":"127.0",
+ "meanData":"127.0",
+ "scaleData":"127.0",
 
- "learningRate":"0.0001",
+ "learningRate":"0.01",
 
  "numberOfTrainIterations":"500",
  "trainOutputFrequency":"20",
