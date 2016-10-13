@@ -253,7 +253,7 @@ python GeneratorBasicObjects.py --size 32 --super-size 128 --min-size 80 --train
 Try it yourself!
 </h3>
 
-Create folder of images for training and testing. Every image has to be labeled. Each line of label file contains name of image and it's label. Labels for net train with euclidean distance loss function are values. Labels for net train with softmax activation function and cross entropy loss function are zero vectors with one specifies class.
+Create folder of images for training and testing. Every image has to be labeled. Each line of label file contains name of image and it's label. Labels for net train with euclidean distance loss function are values. Labels for net train with softmax activation function and cross entropy loss function are zero vectors with one which specifies class.
 <br>
 <br>
 Sample of label file for training with euclidean distance loss function:<br>
