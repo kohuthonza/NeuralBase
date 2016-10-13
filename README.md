@@ -3,3 +3,7 @@
 </div>
 
 Basic implementation of neural networks.
+
+<h2>
+Arguments
+</h2>
