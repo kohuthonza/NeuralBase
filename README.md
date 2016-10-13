@@ -41,6 +41,7 @@ JSON definitions
 Net
 </h4>
 
+```json
 {"inputSample":"/dir/data",
  "grayscale":"False",
  "layers":[
@@ -50,4 +51,6 @@ Net
            "activationFunction":"Sigmoid"},
           ],
  "lossFunction":"SoftMaxCrossEntropy"}
+```
+
 
