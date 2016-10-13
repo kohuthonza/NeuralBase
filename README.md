@@ -10,22 +10,25 @@ Arguments
 <h3>
 CreateNet.py
 </h3>
---net, -n - JSON specification of the net.
-<br>
---train, -t JSON specification of the training process.
-<br>
---output, -o - Name of the net to be saved.
-<br>
---input, -i - Name of the net to be load.
 <table style="width:50%">
-  <tr>
+   <tr>
+    <th>Name</th>
+    <th>Description</th>
+  </tr>
+  <tr>
     <td>--net, -n</td>
-    <td>-</td>
     <td>JSON specification of the net.</td>
   </tr>
   <tr>
-    <td>Eve</td>
-    <td>Jackson</td>
-    <td>Jackson</td>
+    <td>--train, -t</td> 
+    <td>JSON specification of the training process.</td>
+  </tr>
+  <tr>
+    <td>--output, -o</td> 
+    <td>Name of the net to be saved.</td>
+  </tr>
+   <tr>
+    <td>--input, -i</td> 
+    <td>Name of the net to be load.</td>
   </tr>
 </table>
