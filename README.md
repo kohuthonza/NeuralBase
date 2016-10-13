@@ -34,13 +34,13 @@ CreateNet.py
 </table>
 <br>
 
-<h3>
+<h2>
 JSON definitions
-</h3>
+</h2>
 
-<h4>
+<h3>
 Net
-</h4>
+</h3>
 
 ```json
 {"inputSample":"/dir/trainData/train_0.png",
@@ -75,12 +75,38 @@ Net
     <td>Loss function of the net.</td>
   </tr>
 </table>
-<br>
-
 
 <h4>
-Train 
+Types of layers
 </h4>
+
+<table style="width:50%">
+  <tr>
+    <td colspan="2">Fully connected</td>
+  </tr>
+  <tr>
+    <td>type</td>
+    <td>FullyConnected</td>
+  </tr>
+  <tr>
+    <td>numberOfNeurons</td> 
+    <td>Number of neurons in layer (integer).</td>
+  </tr>
+  <tr>
+    <td>bias (optional)</td> 
+    <td>Bias (float).</td>
+  </tr>
+   <tr>
+    <td>activationFunction</td> 
+    <td>Activation function (Sigmoid, SoftMax).</td>
+  </tr>
+</table>
+
+
+
+<h3>
+Train 
+</h3>
 
 ```json
 {"trainData":"/dir/trainData",
