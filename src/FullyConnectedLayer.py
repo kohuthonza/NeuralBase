@@ -5,7 +5,8 @@ import SoftMax
 
 class FullyConnectedLayer(object):
 
-    def __init__(self, numberOfNeurons, activationFunction, bias):
+    def __init__(self, layerType, numberOfNeurons, activationFunction, bias):
+        self.layerType = layerType
         self.numberOfNeurons = numberOfNeurons
         self.activationFunction = activationFunction
         self.bias = bias
@@ -14,7 +15,7 @@ class FullyConnectedLayer(object):
         self.followingLayer = None
         self.previousLayer = None
         self.weights = None
-    
+
     def InitializeWeights(self):
         variance = 2.0/(self.previousLayer.numberOfNeurons + self.numberOfNeurons)
         self.weights = np.random.uniform(-variance, variance, (self.previousLayer.numberOfNeurons, self.numberOfNeurons))
@@ -38,19 +39,11 @@ class FullyConnectedLayer(object):
         if self.activationFunction == 'Sigmoid':
             self.backwardOutput = self.backwardOutput * Sigmoid.Sigmoid.BackwardOutput(self.forwardOutput)
 
-    def ActualizeWeights(self, gamma):
-        #if self.weights.shape[1] == 3:
-        #    print self.ForwardOutput
-
+    def ActualizeWeights(self, learningRate):
         for i, backwardColumn in enumerate(self.backwardOutput.transpose()):
             if (len(self.previousLayer.forwardOutput.shape) == 4):
-                self.weights[:,i] -= gamma * np.sum(backwardColumn.reshape(-1,1) * self.previousLayer.forwardOutput.reshape(self.previousLayer.forwardOutput.shape[0], -1), axis=0)
+                self.weights[:,i] -= learningRate * np.sum(backwardColumn.reshape(-1,1) * self.previousLayer.forwardOutput.reshape(self.previousLayer.forwardOutput.shape[0], -1), axis=0)
             else:
-                self.weights[:,i] -= gamma * np.sum(backwardColumn.reshape(-1,1) * self.previousLayer.forwardOutput, axis=0)
+                self.weights[:,i] -= learningRate * np.sum(backwardColumn.reshape(-1,1) * self.previousLayer.forwardOutput, axis=0)
         if self.bias is not None:
-            self.bias -= gamma * np.sum(self.backwardOutput, axis=0)
-
-        #if self.weights.shape[1] == 3:
-        #    print("Update")
-        #    print self.forwardOutput
-        #    print("**************************")
+            self.bias -= learningRate * np.sum(self.backwardOutput, axis=0)

@@ -11,7 +11,6 @@ import Net
 
 def parse_args():
     print( ' '.join(sys.argv))
-
     parser = argparse.ArgumentParser(epilog="NeuralBase")
     parser.add_argument('-n', '--net',
                         type=str,
@@ -24,14 +23,16 @@ def parse_args():
     parser.add_argument('-o', '--output',
                         type=str,
                         help='Name of net to be saved')
+    parser.add_argument('-i', '--input',
+                        type=str,
+                        help='Name of net to be load')
+
     args = parser.parse_args()
 
     return args
 
 def parseJSONNetSpecification(jsonNetSpecification):
-
     netSpecification = {}
-
     layersProperties = ['type', 'numberOfNeurons', 'bias', 'activationFunction']
     layersSpecifications = []
 
@@ -40,10 +41,10 @@ def parseJSONNetSpecification(jsonNetSpecification):
     else:
         sys.exit("JSON file does't specify path to input sample.")
     if 'grayscale' in jsonNetSpecification:
-        if netSpecification['grayscale'] == 'True' or trainSpecification['grayscale'] == 'true':
-            trainSpecification['grayscale'] = 0
+        if jsonNetSpecification['grayscale'] == 'True' or jsonNetSpecification['grayscale'] == 'true':
+            netSpecification['grayscale'] = 0
         else:
-            trainSpecification['grayscale'] = 1
+            netSpecification['grayscale'] = 1
     else:
         netSpecification['grayscale'] = 1
 
@@ -77,18 +78,15 @@ def parseJSONNetSpecification(jsonNetSpecification):
     return netSpecification
 
 def parseJSONTrainSpecification(jsonTrainSpecification):
-
     trainSpecificationProperties = ['trainData', 'trainLabels',
                                     'testData', 'testLabels',
                                     'batchSize',
                                     'meanData', 'scaleData',
                                     'meanLabels', 'scaleLabels',
-                                    'grayscale',
                                     'learningRate',
                                     'learnignRateDrop', 'dropFrequency',
                                     'numberOfTrainIterations', 'trainOutputFrequency',
                                     'numberOfTestIterations', 'testOutputFrequency']
-
     trainSpecification = {}
 
     for trainProperty in trainSpecificationProperties:
@@ -123,7 +121,6 @@ def parseJSONTrainSpecification(jsonTrainSpecification):
     return trainSpecification
 
 def PrepareLabels(trainSpecification):
-
     loadLabels = {}
 
     for datasetLabel in ['trainLabels', 'testLabels']:
@@ -158,8 +155,8 @@ def PrepareInput(dataLabels, dataDirectory, batchSize, meanData, scaleData, mean
     return batch
 
 def CreateNet(netSpecification):
-
     net = Net.Net()
+    net.grayscale = netSpecification['grayscale']
     inputSample = cv2.imread(netSpecification['inputSample'], netSpecification['grayscale'])
     net.CreateDataShape(inputSample)
     net.CreateLayers(netSpecification['layers'], netSpecification['lossFunction'], inputSample)
@@ -168,8 +165,7 @@ def CreateNet(netSpecification):
 
     return net
 
-def TrainNet(trainSpecification, netSpecification, net):
-
+def TrainNet(trainSpecification, net):
     labels = PrepareLabels(trainSpecification)
 
     iterTrainLoss = 0
@@ -187,7 +183,7 @@ def TrainNet(trainSpecification, netSpecification, net):
                             trainSpecification['scaleData'],
                             trainSpecification['meanLabels'],
                             trainSpecification['scaleLabels'],
-                            netSpecification['grayscale'])
+                            net.grayscale)
 
         net.ForwardPropagation(batch['dataBatch'])
         net.lossLayer.LossOutput(batch['labelsBatch'])
@@ -230,22 +226,22 @@ def TrainNet(trainSpecification, netSpecification, net):
                                         trainSpecification['scaleData'],
                                         trainSpecification['meanLabels'],
                                         trainSpecification['scaleLabels'],
-                                        netSpecification['grayscale'])
+                                        net.grayscale)
 
                     net.ForwardPropagation(batch['dataBatch'])
                     net.lossLayer.LossOutput(batch['labelsBatch'])
                     iterTestLoss += net.lossLayer.lossOutput
 
                     for batchIndex in range(trainSpecification['batchSize']):
-                        if netSpecification['lossFunction'] == 'SoftMaxCrossEntropy':
-                            if np.argmax(net.fullyConnectedLayers[-1].forwardOutput[batchIndex]) == np.argmax(batch['labelsBatch'][batchIndex]):
+                        if net.lossLayer.layerType == 'SoftMaxCrossEntropy':
+                            if np.argmax(net.layers[-1].forwardOutput[batchIndex]) == np.argmax(batch['labelsBatch'][batchIndex]):
                                 accuracy += 1
                 print('____________________________________________')
                 print('Last batch from training set:')
-                print("Net: {}".format(net.fullyConnectedLayers[-1].forwardOutput[batchIndex]))
+                print("Net: {}".format(net.layers[-1].forwardOutput[batchIndex]))
                 print("Label: {}".format(batch['labelsBatch'][batchIndex]))
                 print('{} test iteration DONE.'.format(trainSpecification['numberOfTestIterations']))
-                if netSpecification['lossFunction'] == 'SoftMaxCrossEntropy':
+                if net.lossLayer.layerType == 'SoftMaxCrossEntropy':
                     print("Accuracy: {}".format(float(accuracy)/(trainSpecification['numberOfTestIterations'] * trainSpecification['batchSize'])))
                 else:
                     print("Test loss: {}".format(iterTestLoss/trainSpecification['numberOfTestIterations']))
@@ -256,7 +252,6 @@ def TrainNet(trainSpecification, netSpecification, net):
     if iterTrainLoss != 0:
         print('{} train iteration DONE.'.format(outputTrainCounter))
         print("Train loss: {}".format(iterTrainLoss/outputTrainCounter))
-
 
     return net
 
@@ -287,11 +282,16 @@ def main():
     print("")
     print("")
 
-    netSpecification = parseJSONNetSpecification(jsonNetSpecification)
-    trainSpecification = parseJSONTrainSpecification(jsonTrainSpecification)
+    if args.input is not None:
+        f = open(args.input + ".bn", "rb")
+        net = pickle.load(f)
+        f.close()
+    else:
+        netSpecification = parseJSONNetSpecification(jsonNetSpecification)
+        net = CreateNet(netSpecification)
 
-    net = CreateNet(netSpecification)
-    net = TrainNet(trainSpecification, netSpecification, net)
+    trainSpecification = parseJSONTrainSpecification(jsonTrainSpecification)
+    net = TrainNet(trainSpecification, net)
 
     if args.output is not None:
         f = open(args.output + ".bn", "wb")
