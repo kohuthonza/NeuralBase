@@ -32,7 +32,6 @@ CreateNet.py
     <td>Name of the net to be load.</td>
   </tr>
 </table>
-<br>
 
 <h3>
 Usage
@@ -49,6 +48,8 @@ Finetuning
 </h4>
 
 python CreateNet.py --train train.json --input net.nb --output newNet.nb
+
+<br>
 
 <h2>
 JSON definitions
