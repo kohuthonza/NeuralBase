@@ -233,7 +233,7 @@ Require [python-mnist](https://github.com/sorki/python-mnist) to be installed. R
 Usage
 </h4>
 python loadMNIST.py
-
+<br>
 <h3>
 Basic objects
 </h3>
@@ -244,7 +244,7 @@ Usage
 </h4>
 python GeneratorBasicObjects.py --size 32 --super-size 128 --min-size 80 --train-size 20000 --test-size 2000 --type 
 python GeneratorBasicObjects.py --size 32 --super-size 128 --min-size 80 --train-size 20000 --test-size 2000 --color
-
+<br>
 <h3>
 Try it yourself!
 </h3>
