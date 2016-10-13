@@ -20,15 +20,15 @@ CreateNet.py
     <td>JSON definition of the net.</td>
   </tr>
   <tr>
-    <td>--train, -t</td> 
+    <td><b>--train, -t</b></td> 
     <td>JSON definition of the training process.</td>
   </tr>
   <tr>
-    <td>--output, -o</td> 
+    <td><b>--output, -o</b></td> 
     <td>Name of the net to be saved.</td>
   </tr>
    <tr>
-    <td>--input, -i</td> 
+    <td><b>--input, -i</b></td> 
     <td>Name of the net to be load.</td>
   </tr>
 </table>
@@ -59,19 +59,19 @@ Net
     <th>Description</th>
   </tr>
   <tr>
-    <td>inputSample</td>
+    <td><b>inputSample</b></td>
     <td>Path to train file.</td>
   </tr>
   <tr>
-    <td>grayscale (optinal, default=False)</td> 
+    <td><b>grayscale</b> (optinal, default=False)</td> 
     <td>Load images in grayscale.</td>
   </tr>
   <tr>
-    <td>layers</td> 
+    <td><b>layers</b></td> 
     <td>List of layers definitions.</td>
   </tr>
    <tr>
-    <td>lossFunction</td> 
+    <td><b>lossFunction</b></td> 
     <td>Loss function of the net.</td>
   </tr>
 </table>
@@ -85,19 +85,19 @@ Types of layers
     <td colspan="2">Fully connected</td>
   </tr>
   <tr>
-    <td>type</td>
+    <td><b>type</b></td>
     <td>FullyConnected</td>
   </tr>
   <tr>
-    <td>numberOfNeurons</td> 
+    <td><b>numberOfNeurons</b></td> 
     <td>Number of neurons in layer (integer).</td>
   </tr>
   <tr>
-    <td>bias (optional)</td> 
+    <td><b>bias</b> (optional)</td> 
     <td>Bias (float).</td>
   </tr>
    <tr>
-    <td>activationFunction</td> 
+    <td><b>activationFunction</b></td> 
     <td>Activation function (Sigmoid, SoftMax).</td>
   </tr>
 </table>
