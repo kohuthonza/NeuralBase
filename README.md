@@ -202,6 +202,19 @@ Train
   </tr>
 </table>
 
+<h2>
+Serialization
+</h2>
 
+<h3>
+Create new net
+</h3>
 
+python CreateNet.py --net net.json --train --train.json --output newNet.nb
+
+<h3>
+Finetuning
+</h3>
+
+python CreateNet.py --train train.json --input net.nb --output newNet.nb
 
