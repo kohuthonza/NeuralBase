@@ -17,19 +17,19 @@ CreateNet.py
   </tr>
   <tr>
     <td><b>--net, -n</b></td>
-    <td>JSON definition of the net.</td>
+    <td>JSON definition of net.</td>
   </tr>
   <tr>
     <td><b>--train, -t</b></td> 
-    <td>JSON definition of the training process.</td>
+    <td>JSON definition of training process.</td>
   </tr>
   <tr>
     <td><b>--output, -o</b></td> 
-    <td>Name of the net to be saved.</td>
+    <td>Name of net to be saved.</td>
   </tr>
    <tr>
     <td><b>--input, -i</b></td> 
-    <td>Name of the net to be load.</td>
+    <td>Name of net to be load.</td>
   </tr>
 </table>
 
@@ -92,7 +92,7 @@ Net
   </tr>
    <tr>
     <td><b>lossFunction</b></td> 
-    <td>Loss function of the net.</td>
+    <td>Loss function of net.</td>
   </tr>
 </table>
 
@@ -227,12 +227,45 @@ Datasets
 <h3>
 MNIST
 </h3>
-
-Require https://github.com/sorki/python-mnist 
+Require https://github.com/sorki/python-mnist to be installed. Run loadMNIST.py in directory with MNIST (http://yann.lecun.com/exdb/mnist/) ubyte files.
+ 
+<h4>
+Usage
+</h4>
+python loadMNIST.py
 
 <h3>
 Basic objects
 </h3>
+Generate basic objects of random color. 
+
+<h4>
+Usage
+</h4>
+python GeneratorBasicObjects.py --size 32 --super-size 128 --min-size 80 --train-size 20000 --test-size 2000 --type 
+python GeneratorBasicObjects.py --size 32 --super-size 128 --min-size 80 --train-size 20000 --test-size 2000 --color
+
+<h3>
+Try it yourself!
+</h3>
+
+Create folder of images for training and testing. Every image has to be labeled. Each line of label file contains name of image and it's label. Labels for net train with euclidean distance loss function are values. Labels for net train with softmax activation function and cross entropy loss function are zero vectors with one specifies class.
+<br>
+Sample of label file for training with euclidean distance loss function:
+<br>
+testRGB_0.png 0.419608 0.541176 0.011765
+testRGB_1.png 0.800000 0.376471 0.109804
+testRGB_2.png 0.070588 0.349020 0.623529
+testRGB_3.png 0.262745 0.376471 0.015686
+<br>
+Sample of label file for training with softmax and cross entropy loss function (3 classes):
+<br>
+test_0.png 0.000000 1.000000 0.000000
+test_1.png 0.000000 1.000000 0.000000
+test_2.png 0.000000 1.000000 0.000000
+test_3.png 0.000000 0.000000 1.000000
+
+
 
 
 
