@@ -5,6 +5,15 @@
 Basic implementation of neural networks.
 
 <h2>
+Requirements
+</h2>
+
+Python 2.7
+NumPy
+OpenCV
+<br>
+
+<h2>
 Arguments
 </h2>
 <h3>
