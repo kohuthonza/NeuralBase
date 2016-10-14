@@ -8,9 +8,9 @@ Basic implementation of neural networks.
 Requirements
 </h2>
 
-Python 2.7
-NumPy
-OpenCV
+Python 2.7<br>
+NumPy<br>
+OpenCV<br>
 <br>
 
 <h2>
