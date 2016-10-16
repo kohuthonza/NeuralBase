@@ -148,12 +148,12 @@ def PrepareInput(dataLabels, dataDirectory, batchSize, meanData, scaleData, mean
         batch['dataBatch'].append(img)
         labels = dataLabels[index][1:]
         labels = [float(tmpLabel) for tmpLabel in labels]
-        if meanLabels is not None:
-            labels -= meanLabels
-        if scaleLabels is not None:
-            labels = label/scaleLabels
         batch['labelsBatch'].append(labels)
     batch['labelsBatch'] = np.asarray(batch['labelsBatch'])
+    if meanLabels is not None:
+        batch['labelsBatch'] -= meanLabels
+    if scaleLabels is not None:
+        batch['labelsBatch'] = batch['labelsBatch']/scaleLabels
 
     return batch
 
@@ -189,11 +189,12 @@ def TrainNet(trainSpecification, net):
                             net.grayscale)
 
         net.ForwardPropagation(batch['dataBatch'])
-        net.lossLayer.LossOutput(batch['labelsBatch'])
+        net.lossLayer.target = batch['labelsBatch']
+        net.lossLayer.ForwardOutput()
         net.BackwardPropagation(batch['labelsBatch'])
         net.ActualizeWeights(trainSpecification['learningRate'])
 
-        iterTrainLoss += net.lossLayer.lossOutput
+        iterTrainLoss += net.lossLayer.forwardOutput
 
         trainCounter += 1
         testCounter += 1
@@ -232,8 +233,9 @@ def TrainNet(trainSpecification, net):
                                         net.grayscale)
 
                     net.ForwardPropagation(batch['dataBatch'])
-                    net.lossLayer.LossOutput(batch['labelsBatch'])
-                    iterTestLoss += net.lossLayer.lossOutput
+                    net.lossLayer.target = batch['labelsBatch']
+                    net.lossLayer.ForwardOutput()
+                    iterTestLoss += net.lossLayer.forwardOutput
 
                     for batchIndex in range(trainSpecification['batchSize']):
                         if net.lossLayer.layerType == 'SoftMaxCrossEntropy':

@@ -7,7 +7,7 @@ import EuclideanDistance
 import SoftMaxCrossEntropy
 
 class Net(object):
-    
+
     def __init__(self):
         self.dataShape = DataShape.DataShape()
         self.grayscale = None
@@ -65,7 +65,8 @@ class Net(object):
             layer.ForwardOutput()
 
     def BackwardPropagation(self, target):
-        self.lossLayer.BackwardOutput(target)
+        self.lossLayer.target = target
+        self.lossLayer.BackwardOutput()
         self.layers[-1].backwardOutput = self.lossLayer.backwardOutput
         for layerIndex in range(0, len(self.layers) - 1):
             self.layers[len(self.layers) - layerIndex - 2].BackwardOutput()
