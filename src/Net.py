@@ -1,5 +1,6 @@
 import DataShape
 import InputLayer
+import ConvolutionalLayer
 import FullyConnectedLayer
 import Sigmoid
 import SoftMax
@@ -29,8 +30,8 @@ class Net(object):
             self.dataShape.height = inputSample.shape[0]
             self.dataShape.width = inputSample.shape[1]
 
-    def CreateLayers(self, layersProperties, lossLayer, inputSample):
-        self.inputLayer = InputLayer.InputLayer(inputSample)
+    def CreateLayers(self, layersProperties, lossLayer):
+        self.inputLayer = InputLayer.InputLayer(self.dataShape)
         if lossLayer == 'EuclideanDistance':
             self.lossLayer = EuclideanDistance.EuclideanDistance('EuclideanDistance')
         elif lossLayer == 'SoftMaxCrossEntropy':
@@ -42,6 +43,11 @@ class Net(object):
                                                 layerProperties['numberOfNeurons'],
                                                 layerProperties['activationFunction'],
                                                 layerProperties['bias']))
+            elif layerProperties['type'] == 'Convolutional':
+                self.layers.append(ConvolutionalLayer.ConvolutionalLayer(
+                                                layerProperties['kernelSize'],
+                                                layerProperties['numberOfKernels'],
+                                                layerProperties['stride']))
     def ConectLayers(self):
         self.inputLayer.followingLayer = self.layers[0]
         self.layers[0].previousLayer = self.inputLayer
@@ -59,8 +65,8 @@ class Net(object):
         for layer in self.layers:
             layer.InitializeWeights()
 
-    def ForwardPropagation(self, input):
-        self.inputLayer.ForwardOutput(input, self.dataShape)
+    def ForwardPropagation(self, dataInput):
+        self.inputLayer.ForwardOutput(dataInput)
         for layer in self.layers:
             layer.ForwardOutput()
 

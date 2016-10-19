@@ -23,7 +23,7 @@ class FullyConnectedLayer(object):
             self.bias = np.full(self.numberOfNeurons, self.bias, dtype=np.float)
 
     def ForwardOutput(self):
-        if (len(self.previousLayer.forwardOutput.shape) == 4):
+        if (len(self.previousLayer.forwardOutput.shape) != 1):
             self.forwardOutput = np.dot(self.previousLayer.forwardOutput.reshape(self.previousLayer.forwardOutput.shape[0], -1), self.weights)
         else:
             self.forwardOutput = np.dot(self.previousLayer.forwardOutput, self.weights)

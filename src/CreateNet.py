@@ -33,7 +33,7 @@ def parse_args():
 
 def parseJSONNetSpecification(jsonNetSpecification):
     netSpecification = {}
-    layersProperties = ['type', 'numberOfNeurons', 'bias', 'activationFunction']
+    layersProperties = ['type', 'numberOfNeurons', 'bias', 'activationFunction', 'kernelSize', 'numberOfKernels', 'stride']
     layersSpecifications = []
 
     if 'inputSample' in jsonNetSpecification:
@@ -54,15 +54,24 @@ def parseJSONNetSpecification(jsonNetSpecification):
             for layerProperty in layersProperties:
                 if layerProperty in jsonLayerSpecification:
                     layer[layerProperty] = jsonLayerSpecification[layerProperty]
-                    if layerProperty == 'numberOfNeurons':
-                        layer[layerProperty] = int(layer[layerProperty])
-                    elif layerProperty == 'bias':
-                        layer[layerProperty] = float(layer[layerProperty])
+
+                    if jsonLayerSpecification['type'] == 'FullyConnected':
+                        if layerProperty == 'numberOfNeurons':
+                            layer[layerProperty] = int(layer[layerProperty])
+                        elif layerProperty == 'bias':
+                            layer[layerProperty] = float(layer[layerProperty])
+                    elif jsonLayerSpecification['type'] == 'Convolutional':
+                        if layerProperty == 'kernelSize':
+                            layer[layerProperty] = int(layer[layerProperty])
+                        elif layerProperty == 'numberOfKernels':
+                            layer[layerProperty] = int(layer[layerProperty])
+                        elif layerProperty == 'stride':
+                            layer[layerProperty] = int(layer[layerProperty])
                 else:
                     if layerProperty == 'type':
                         sys.exit("JSON net file doesn't specify type of some layer.")
-                    elif layerProperty == 'numberOfNeurons':
-                        sys.exit("JSON net file doesn't specify number of neurons in some layer.")
+                    #elif layerProperty == 'numberOfNeurons':
+                    #    sys.exit("JSON net file doesn't specify number of neurons in some layer.")
                     layer[layerProperty] = None
             layersSpecifications.append(layer)
     else:
@@ -162,7 +171,7 @@ def CreateNet(netSpecification):
     net.grayscale = netSpecification['grayscale']
     inputSample = cv2.imread(netSpecification['inputSample'], netSpecification['grayscale'])
     net.CreateDataShape(inputSample)
-    net.CreateLayers(netSpecification['layers'], netSpecification['lossFunction'], inputSample)
+    net.CreateLayers(netSpecification['layers'], netSpecification['lossFunction'])
     net.ConectLayers()
     net.InitializeWeights()
 
@@ -191,8 +200,8 @@ def TrainNet(trainSpecification, net):
         net.ForwardPropagation(batch['dataBatch'])
         net.lossLayer.target = batch['labelsBatch']
         net.lossLayer.ForwardOutput()
-        net.BackwardPropagation(batch['labelsBatch'])
-        net.ActualizeWeights(trainSpecification['learningRate'])
+        #net.BackwardPropagation(batch['labelsBatch'])
+        #net.ActualizeWeights(trainSpecification['learningRate'])
 
         iterTrainLoss += net.lossLayer.forwardOutput
 
