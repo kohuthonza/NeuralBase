@@ -2,8 +2,8 @@ import numpy as np
 
 class SoftMaxCrossEntropy(object):
 
-    def __init__(self, layerType):
-        self.layerType = layerType
+    def __init__(self):
+        self.layerType = 'SoftMaxCrossEntropy'
         self.previousLayer = None
         self.forwardOutput = None
         self.backwardOutput = None
@@ -13,4 +13,4 @@ class SoftMaxCrossEntropy(object):
         self.forwardOutput = np.sum(self.previousLayer.forwardOutput - self.target)
 
     def BackwardOutput(self):
-        self.backwardOutput =  self.previousLayer.forwardOutput - self.target
+        self.backwardOutput = self.previousLayer.forwardOutput - self.target

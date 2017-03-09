@@ -2,8 +2,12 @@ import DataShape
 import InputLayer
 import ConvolutionalLayer
 import FullyConnectedLayer
-import Sigmoid
-import SoftMax
+import SigmoidLayer
+import ReLULayer
+import SoftMaxLayer
+import BatchNormalizationLayer
+import SignumLayer
+import BinaryFullyConnectedLayer
 import EuclideanDistance
 import SoftMaxCrossEntropy
 
@@ -33,16 +37,29 @@ class Net(object):
     def CreateLayers(self, layersProperties, lossLayer):
         self.inputLayer = InputLayer.InputLayer(self.dataShape)
         if lossLayer == 'EuclideanDistance':
-            self.lossLayer = EuclideanDistance.EuclideanDistance('EuclideanDistance')
+            self.lossLayer = EuclideanDistance.EuclideanDistance()
         elif lossLayer == 'SoftMaxCrossEntropy':
-            self.lossLayer = SoftMaxCrossEntropy.SoftMaxCrossEntropy('SoftMaxCrossEntropy')
+            self.lossLayer = SoftMaxCrossEntropy.SoftMaxCrossEntropy()
         for layerProperties in layersProperties:
             if layerProperties['type'] == 'FullyConnected':
                 self.layers.append(FullyConnectedLayer.FullyConnectedLayer(
-                                                layerProperties['type'],
                                                 layerProperties['numberOfNeurons'],
-                                                layerProperties['activationFunction'],
                                                 layerProperties['bias']))
+            elif layerProperties['type'] == 'BinaryFullyConnected':
+                self.layers.append(BinaryFullyConnectedLayer.BinaryFullyConnectedLayer(
+                                            layerProperties['numberOfNeurons'],
+                                            layerProperties['bias']))
+            elif layerProperties['type'] == 'BatchNormalization':
+                self.layers.append(BatchNormalizationLayer.BatchNormalizationLayer(
+                                                layerProperties['eps']))
+            elif layerProperties['type'] == 'Signum':
+                self.layers.append(SignumLayer.SignumLayer())
+            elif layerProperties['type'] == 'Sigmoid':
+                self.layers.append(SigmoidLayer.SigmoidLayer())
+            elif layerProperties['type'] == 'ReLU':
+                self.layers.append(ReLULayer.ReLULayer())
+            elif layerProperties['type'] == 'SoftMax':
+                self.layers.append(SoftMaxLayer.SoftMaxLayer())
             elif layerProperties['type'] == 'Convolutional':
                 self.layers.append(ConvolutionalLayer.ConvolutionalLayer(
                                                 layerProperties['kernelSize'],
@@ -73,9 +90,8 @@ class Net(object):
     def BackwardPropagation(self, target):
         self.lossLayer.target = target
         self.lossLayer.BackwardOutput()
-        self.layers[-1].backwardOutput = self.lossLayer.backwardOutput
         for layerIndex in range(0, len(self.layers) - 1):
-            self.layers[len(self.layers) - layerIndex - 2].BackwardOutput()
+            self.layers[len(self.layers) - layerIndex - 1].BackwardOutput()
 
     def ActualizeWeights(self, learningRate):
         for layer in self.layers:

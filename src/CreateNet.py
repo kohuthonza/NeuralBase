@@ -33,7 +33,7 @@ def parse_args():
 
 def parseJSONNetSpecification(jsonNetSpecification):
     netSpecification = {}
-    layersProperties = ['type', 'numberOfNeurons', 'bias', 'activationFunction', 'kernelSize', 'numberOfKernels', 'stride']
+    layersProperties = ['type', 'eps', 'numberOfNeurons', 'bias', 'kernelSize', 'numberOfKernels', 'stride']
     layersSpecifications = []
 
     if 'inputSample' in jsonNetSpecification:
@@ -59,6 +59,14 @@ def parseJSONNetSpecification(jsonNetSpecification):
                         if layerProperty == 'numberOfNeurons':
                             layer[layerProperty] = int(layer[layerProperty])
                         elif layerProperty == 'bias':
+                            layer[layerProperty] = float(layer[layerProperty])
+                    elif jsonLayerSpecification['type'] == 'BinaryFullyConnected':
+                        if layerProperty == 'numberOfNeurons':
+                            layer[layerProperty] = int(layer[layerProperty])
+                        elif layerProperty == 'bias':
+                            layer[layerProperty] = float(layer[layerProperty])
+                    elif jsonLayerSpecification['type'] == "BatchNormalization":
+                        if layerProperty == 'eps':
                             layer[layerProperty] = float(layer[layerProperty])
                     elif jsonLayerSpecification['type'] == 'Convolutional':
                         if layerProperty == 'kernelSize':
@@ -200,8 +208,8 @@ def TrainNet(trainSpecification, net):
         net.ForwardPropagation(batch['dataBatch'])
         net.lossLayer.target = batch['labelsBatch']
         net.lossLayer.ForwardOutput()
-        #net.BackwardPropagation(batch['labelsBatch'])
-        #net.ActualizeWeights(trainSpecification['learningRate'])
+        net.BackwardPropagation(batch['labelsBatch'])
+        net.ActualizeWeights(trainSpecification['learningRate'])
 
         iterTrainLoss += net.lossLayer.forwardOutput
 
