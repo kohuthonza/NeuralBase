@@ -8,6 +8,7 @@ from collections import OrderedDict
 import numpy as np
 import pickle
 import Net
+import cPickle
 
 def parse_args():
     print( ' '.join(sys.argv))
@@ -36,10 +37,6 @@ def parseJSONNetSpecification(jsonNetSpecification):
     layersProperties = ['type', 'eps', 'numberOfNeurons', 'bias', 'kernelSize', 'numberOfKernels', 'stride']
     layersSpecifications = []
 
-    if 'inputSample' in jsonNetSpecification:
-        netSpecification['inputSample'] = jsonNetSpecification['inputSample']
-    else:
-        sys.exit("JSON file does't specify path to input sample.")
     if 'grayscale' in jsonNetSpecification:
         if jsonNetSpecification['grayscale'] == 'True' or jsonNetSpecification['grayscale'] == 'true':
             netSpecification['grayscale'] = 0
@@ -95,8 +92,7 @@ def parseJSONNetSpecification(jsonNetSpecification):
     return netSpecification
 
 def parseJSONTrainSpecification(jsonTrainSpecification):
-    trainSpecificationProperties = ['trainData', 'trainLabels',
-                                    'testData', 'testLabels',
+    trainSpecificationProperties = ['dataset',
                                     'batchSize',
                                     'meanData', 'scaleData',
                                     'meanLabels', 'scaleLabels',
@@ -125,10 +121,8 @@ def parseJSONTrainSpecification(jsonTrainSpecification):
                 trainSpecification[trainProperty] = float(trainSpecification[trainProperty])
 
         else:
-            if trainProperty == 'trainData':
-                sys.exit("JSON train file doesn't specify folder with training data.")
-            elif trainProperty == 'trainLabels':
-                sys.exit("JSON train file doesn't specify file with training labels.")
+            if trainProperty == 'dataset':
+                sys.exit("JSON train file doesn't specify folder with dataset.")
             elif trainProperty == 'batchSize':
                 trainSpecification[trainProperty] = 32
             elif trainProperty == 'numberOfTrainIterations':
@@ -139,32 +133,21 @@ def parseJSONTrainSpecification(jsonTrainSpecification):
 
     return trainSpecification
 
-def PrepareLabels(trainSpecification):
-    loadLabels = {}
+def PrepareInput(dataLabels, data, batchSize, meanData, scaleData, meanLabels, scaleLabels, grayscale):
 
-    for datasetLabel in ['trainLabels', 'testLabels']:
-        with open(trainSpecification[datasetLabel]) as f:
-            loadLabels[datasetLabel] = f.read().splitlines()
-        for dataIndex in range(len(loadLabels[datasetLabel])):
-            loadLabels[datasetLabel][dataIndex] = loadLabels[datasetLabel][dataIndex].split()
-
-    return loadLabels
-
-def PrepareInput(dataLabels, dataDirectory, batchSize, meanData, scaleData, meanLabels, scaleLabels, grayscale):
     batch = {}
     batch['dataBatch'] = []
     batch['labelsBatch'] = []
     randomIndexes = np.random.randint(len(dataLabels), size=batchSize)
     for index in randomIndexes:
-        img = cv2.imread(os.path.join(dataDirectory, dataLabels[index][0]), grayscale)
+        img = data[index]
         img = img.astype(float)
         if meanData is not None:
             img -= meanData
         if scaleData is not None:
             img = img/scaleData
         batch['dataBatch'].append(img)
-        labels = dataLabels[index][1:]
-        labels = [float(tmpLabel) for tmpLabel in labels]
+        labels = dataLabels[index]
         batch['labelsBatch'].append(labels)
     batch['labelsBatch'] = np.asarray(batch['labelsBatch'])
     if meanLabels is not None:
@@ -177,7 +160,7 @@ def PrepareInput(dataLabels, dataDirectory, batchSize, meanData, scaleData, mean
 def CreateNet(netSpecification):
     net = Net.Net()
     net.grayscale = netSpecification['grayscale']
-    inputSample = cv2.imread(netSpecification['inputSample'], netSpecification['grayscale'])
+    inputSample = np.zeros((32, 32, 3))
     net.CreateDataShape(inputSample)
     net.CreateLayers(netSpecification['layers'], netSpecification['lossFunction'])
     net.ConectLayers()
@@ -186,7 +169,38 @@ def CreateNet(netSpecification):
     return net
 
 def TrainNet(trainSpecification, net):
-    labels = PrepareLabels(trainSpecification)
+
+    trnData = []
+    trnLabels = []
+    tstData = []
+    tstLabels = []
+    for i in range(1,6):
+        with open(trainSpecification['dataset'] + 'data_batch_{}'.format(i)) as f:
+            data = cPickle.load(f)
+        if i == 5:
+            tstData = data['data']
+            tstLabels = data['labels']
+        else:
+            trnData.append(data['data'])
+            trnLabels.append(data['labels'])
+    trnData = np.concatenate(trnData).reshape(-1, 3, 32, 32)
+    trnData = np.concatenate([trnData[:,:,:,::-1], trnData[:,:,:,:]])
+    trnLabels = np.concatenate(trnLabels)
+    trnLabels = np.concatenate([trnLabels, trnLabels])
+    tstData = tstData.reshape(-1, 3, 32, 32)
+    tstData = np.concatenate([tstData[:,:,:,::-1], tstData[:,:,:,:]])
+    tstLabels = np.concatenate([tstLabels, tstLabels])
+
+    trnData = np.rollaxis(trnData, 1, 4)
+    tstData = np.rollaxis(tstData, 1, 4)
+
+    trainLabels = np.zeros((trnLabels.shape[0], 10))
+    testLabels = np.zeros((tstLabels.shape[0], 10))
+
+    for i in range(0, trainLabels.shape[0]):
+        trainLabels[i][trnLabels[i]] = 1
+    for i in range(0, testLabels.shape[0]):
+        testLabels[i][tstLabels[i]] = 1
 
     iterTrainLoss = 0
     iterTestLoss = 0
@@ -194,13 +208,14 @@ def TrainNet(trainSpecification, net):
     outputTrainCounter = 0
     testCounter = 0
     dropFrequencyCounter = 0
+
     weightsCounter = 0
+
     accuracy = 0
 
-
     for trainCounter in range(trainSpecification['numberOfTrainIterations']):
-        batch = PrepareInput(labels['trainLabels'],
-                            trainSpecification['trainData'],
+        batch = PrepareInput(trainLabels,
+                            trnData,
                             trainSpecification['batchSize'],
                             trainSpecification['meanData'],
                             trainSpecification['scaleData'],
@@ -220,7 +235,7 @@ def TrainNet(trainSpecification, net):
         testCounter += 1
         outputTrainCounter += 1
 
-        """
+
         if weightsCounter == 0:
             fullLayerWeights = np.copy(net.layers[0].weights)
             firstLayerWeights = np.copy(np.sign(net.layers[5].binaryWeights))
@@ -233,11 +248,12 @@ def TrainNet(trainSpecification, net):
             print np.sum(np.abs(secondLayerWeights - np.sign(net.layers[8].binaryWeights)))/2.0
             print np.sum(np.abs(lastLayerWeights - net.layers[9].weights))/float(net.layers[9].weights.size)
             weightsCounter = 0
-        """
+        
         if net.lossLayer.layerType == 'SoftMaxCrossEntropy':
             for batchIndex in range(trainSpecification['batchSize']):
                 if np.argmax(net.layers[-1].forwardOutput[batchIndex]) == np.argmax(batch['labelsBatch'][batchIndex]):
                     accuracy += 1
+
 
         if trainSpecification['dropFrequency'] is not None:
             dropFrequencyCounter += 1
@@ -265,8 +281,8 @@ def TrainNet(trainSpecification, net):
                 print('********************************************')
                 print('Testing net...')
                 for counter in range(trainSpecification['numberOfTestIterations']):
-                    batch = PrepareInput(labels['testLabels'],
-                                        trainSpecification['testData'],
+                    batch = PrepareInput(testLabels,
+                                        tstData,
                                         trainSpecification['batchSize'],
                                         trainSpecification['meanData'],
                                         trainSpecification['scaleData'],
@@ -279,8 +295,8 @@ def TrainNet(trainSpecification, net):
                     net.lossLayer.ForwardOutput()
                     iterTestLoss += net.lossLayer.forwardOutput
 
-                    for batchIndex in range(trainSpecification['batchSize']):
-                        if net.lossLayer.layerType == 'SoftMaxCrossEntropy':
+                    if net.lossLayer.layerType == 'SoftMaxCrossEntropy':
+                        for batchIndex in range(trainSpecification['batchSize']):
                             if np.argmax(net.layers[-1].forwardOutput[batchIndex]) == np.argmax(batch['labelsBatch'][batchIndex]):
                                 accuracy += 1
                 print('____________________________________________')
@@ -296,7 +312,6 @@ def TrainNet(trainSpecification, net):
                 print("")
                 iterTestLoss = 0
                 accuracy = 0
-
 
     if iterTrainLoss != 0:
         print('{} train iteration DONE.'.format(outputTrainCounter))

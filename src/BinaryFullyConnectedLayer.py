@@ -23,6 +23,7 @@ class BinaryFullyConnectedLayer(object):
     def ForwardOutput(self):
         self.alpha = np.abs(self.weights).mean()
         self.binaryWeights = np.sign(self.weights)
+        self.binaryWeights *= self.alpha
         if (len(self.previousLayer.forwardOutput.shape) != 2):
             self.forwardOutput = np.dot(self.previousLayer.forwardOutput.reshape(self.previousLayer.forwardOutput.shape[0], -1), self.binaryWeights)
         else:
@@ -34,10 +35,24 @@ class BinaryFullyConnectedLayer(object):
         self.backwardOutput = np.dot(self.followingLayer.backwardOutput, self.binaryWeights.transpose())
 
     def ActualizeWeights(self, learningRate):
+
+        weightGradients = np.zeros(self.weights.shape)
         for i, backwardColumn in enumerate(self.followingLayer.backwardOutput.transpose()):
             if (len(self.previousLayer.forwardOutput.shape) == 4):
-                self.weights[:,i] -= learningRate * np.sum(backwardColumn.reshape(-1,1) * self.previousLayer.forwardOutput.reshape(self.previousLayer.forwardOutput.shape[0], -1), axis=0)
+                weightGradients[:,i] = np.sum(backwardColumn.reshape(-1,1) * self.previousLayer.forwardOutput.reshape(self.previousLayer.forwardOutput.shape[0], -1), axis=0)
             else:
-                self.weights[:,i] -= learningRate * np.sum(backwardColumn.reshape(-1,1) * self.previousLayer.forwardOutput, axis=0)
+                weightGradients[:,i] = np.sum(backwardColumn.reshape(-1,1) * self.previousLayer.forwardOutput, axis=0)
+
+        """
+        gradientUpdate = np.zeros(self.weights.shape)
+        gradientUpdate.fill(self.alpha)
+        gradientUpdate[self.weights > 1] = 0
+        gradientUpdate[self.weights < -1] = 0
+        gradientUpdate += 1.0/self.weights.size
+
+        weightGradients *= gradientUpdate
+        """
+
+        self.weights -= learningRate * weightGradients
         if self.bias is not None:
             self.bias -= learningRate * np.sum(self.followingLayer.backwardOutput, axis=0)

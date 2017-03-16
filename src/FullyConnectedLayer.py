@@ -30,10 +30,13 @@ class FullyConnectedLayer(object):
         self.backwardOutput = np.dot(self.followingLayer.backwardOutput, self.weights.transpose())
 
     def ActualizeWeights(self, learningRate):
+        weightGradients = np.zeros(self.weights.shape)
         for i, backwardColumn in enumerate(self.followingLayer.backwardOutput.transpose()):
             if (len(self.previousLayer.forwardOutput.shape) == 4):
-                self.weights[:,i] -= learningRate * np.sum(backwardColumn.reshape(-1,1) * self.previousLayer.forwardOutput.reshape(self.previousLayer.forwardOutput.shape[0], -1), axis=0)
+                weightGradients[:,i] = np.sum(backwardColumn.reshape(-1,1) * self.previousLayer.forwardOutput.reshape(self.previousLayer.forwardOutput.shape[0], -1), axis=0)
             else:
-                self.weights[:,i] -= learningRate * np.sum(backwardColumn.reshape(-1,1) * self.previousLayer.forwardOutput, axis=0)
+                weightGradients[:,i] = np.sum(backwardColumn.reshape(-1,1) * self.previousLayer.forwardOutput, axis=0)
+
+        self.weights -= learningRate * weightGradients
         if self.bias is not None:
             self.bias -= learningRate * np.sum(self.followingLayer.backwardOutput, axis=0)
